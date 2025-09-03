@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/solar-hero.jpg";
 import { ArrowRight, Users, Wrench, Zap } from "lucide-react";
 
@@ -32,13 +33,17 @@ export const Hero = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button variant="hero" size="lg" className="group">
-                Find Services
-                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button variant="outline-light" size="lg">
-                Join as Engineer
-              </Button>
+              <Link to="/find-services">
+                <Button variant="hero" size="lg" className="group">
+                  Find Services
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+              <Link to="/join">
+                <Button variant="outline-light" size="lg">
+                  Join as Engineer
+                </Button>
+              </Link>
             </div>
           </div>
           

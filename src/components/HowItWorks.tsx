@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { Search, MessageCircle, HandshakeIcon, CheckCircle } from "lucide-react";
 
 const steps = [
@@ -80,9 +81,11 @@ export const HowItWorks = () => {
             <p className="text-primary-foreground/90 mb-6">
               Access vetted professionals and specialized resources to accelerate your solar projects.
             </p>
-            <Button variant="outline-light" size="lg">
-              Find Services Now
-            </Button>
+            <Link to="/find-services">
+              <Button variant="outline-light" size="lg">
+                Find Services Now
+              </Button>
+            </Link>
           </Card>
 
           {/* For Engineers */}
@@ -93,9 +96,11 @@ export const HowItWorks = () => {
             <p className="text-secondary-foreground/90 mb-6">
               Join our network of professionals and grow your business with quality solar projects.
             </p>
-            <Button variant="outline-light" size="lg">
-              Join Our Network
-            </Button>
+            <Link to="/join">
+              <Button variant="outline-light" size="lg">
+                Join Our Network
+              </Button>
+            </Link>
           </Card>
         </div>
       </div>

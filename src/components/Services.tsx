@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { Users, Wrench, PenTool, ArrowRight } from "lucide-react";
 
 const services = [
@@ -69,8 +70,10 @@ export const Services = () => {
                   </ul>
                   
                   <Button variant="outline" className="group">
-                    Learn More
-                    <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <Link to="/find-services" className="flex items-center">
+                      Learn More
+                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
                   </Button>
                 </div>
               </Card>
