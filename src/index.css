@@ -2,41 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Solar Marketplace Design System - Professional B2B with Solar Theme */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 0 0% 99%;
+    --foreground: 222 20% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222 20% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 222 20% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Solar Orange Primary */
+    --primary: 35 100% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 38 100% 65%;
+    --primary-dark: 32 100% 45%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Professional Blue Secondary */
+    --secondary: 215 60% 16%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 215 45% 25%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Clean Energy Green Accent */
+    --accent: 145 80% 45%;
+    --accent-foreground: 0 0% 100%;
+    --accent-light: 145 70% 55%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted: 220 15% 96%;
+    --muted-foreground: 220 10% 45%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 15% 90%;
+    --input: 220 15% 92%;
+    --ring: 35 100% 55%;
 
     --radius: 0.5rem;
+
+    /* Solar Gradients */
+    --gradient-solar: linear-gradient(135deg, hsl(35 100% 55%), hsl(38 100% 65%));
+    --gradient-professional: linear-gradient(135deg, hsl(215 60% 16%), hsl(215 45% 25%));
+    --gradient-hero: linear-gradient(135deg, hsl(35 100% 55%) 0%, hsl(215 60% 16%) 100%);
+    
+    /* Shadows */
+    --shadow-solar: 0 10px 40px -10px hsl(35 100% 55% / 0.3);
+    --shadow-card: 0 4px 20px -4px hsl(220 15% 50% / 0.15);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
 
