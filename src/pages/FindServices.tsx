@@ -12,7 +12,8 @@ import {
   Filter,
   ArrowRight
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { EngineerCard } from "@/components/EngineerCard";
 
 const services = [
   {
@@ -56,6 +57,64 @@ const services = [
   }
 ];
 
+const engineers = [
+  {
+    id: "eng-1",
+    name: "Ava Thompson",
+    location: "Austin, TX",
+    specialties: ["Utility-Scale I&C", "SCADA", "Commissioning"],
+    rating: 4.9,
+    totalProjects: 120,
+    hourlyRate: 85,
+    availability: "available" as const,
+    avatarUrl: "/api/placeholder/64/64",
+  },
+  {
+    id: "eng-2",
+    name: "Miguel Santos",
+    location: "San Diego, CA",
+    specialties: ["Inverter Start-up", "Thermal Imaging", "Medium Voltage"],
+    rating: 4.8,
+    totalProjects: 98,
+    hourlyRate: 92,
+    availability: "busy" as const,
+    avatarUrl: "/api/placeholder/64/64",
+  },
+  {
+    id: "eng-3",
+    name: "Priya Sharma",
+    location: "Phoenix, AZ",
+    specialties: ["PV Design", "PVsyst", "Permit Drawings", "As-Builts"],
+    rating: 5.0,
+    totalProjects: 150,
+    hourlyRate: 100,
+    availability: "available" as const,
+    avatarUrl: "/api/placeholder/64/64",
+  },
+  {
+    id: "eng-4",
+    name: "Liam O'Connor",
+    location: "Denver, CO",
+    specialties: ["QA/QC", "IV Curve Tracing", "String Commissioning"],
+    rating: 4.7,
+    totalProjects: 76,
+    hourlyRate: 80,
+    availability: "unavailable" as const,
+    avatarUrl: "/api/placeholder/64/64",
+  },
+  {
+    id: "eng-5",
+    name: "Sara Kim",
+    location: "Los Angeles, CA",
+    specialties: ["Protection Testing", "Relay Settings", "MV Switchgear"],
+    rating: 4.85,
+    totalProjects: 110,
+    hourlyRate: 120,
+    availability: "busy" as const,
+    avatarUrl: "/api/placeholder/64/64",
+  },
+];
+
 const getTypeIcon = (type: string) => {
   switch (type) {
     case "I&C Team": return <Users className="w-4 h-4" />;
@@ -78,6 +137,26 @@ export default function FindServices() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("All");
 
+  useEffect(() => {
+    document.title = "Find Solar Services & Engineers | SolarConnect";
+    const desc = "Find solar services and top solar engineers near you for design, I&C, testing, and more.";
+    let tag = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+    if (!tag) {
+      tag = document.createElement("meta");
+      tag.setAttribute("name", "description");
+      document.head.appendChild(tag);
+    }
+    tag.setAttribute("content", desc);
+
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute("href", window.location.href);
+  }, []);
+
   const serviceTypes = ["All", "I&C Team", "Solar Design", "Tools"];
 
   return (
@@ -85,7 +164,7 @@ export default function FindServices() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-4">Find Solar Services</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-4">Find Solar Services & Engineers</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Connect with verified I&C teams, design experts, and equipment providers for your solar projects
           </p>
@@ -201,10 +280,24 @@ export default function FindServices() {
           ))}
         </div>
 
+        {/* Engineers Section */}
+        <div className="mt-16">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold text-foreground">
+              {engineers.length} Engineers Available
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {engineers.map((eng) => (
+              <EngineerCard key={eng.id} {...eng} />
+            ))}
+          </div>
+        </div>
+
         {/* Load More */}
         <div className="text-center mt-12">
           <Button variant="outline" size="lg">
-            Load More Services
+            Load More Results
           </Button>
         </div>
       </div>
