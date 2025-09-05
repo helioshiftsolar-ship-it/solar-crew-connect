@@ -48,8 +48,14 @@ export const Header = () => {
               <Button variant="ghost">Join as Engineer</Button>
             </Link>
             <Link to="/find-services">
-              <Button>Find Services</Button>
+              <Button variant="outline">Find Services</Button>
             </Link>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/login">Sign In</Link>
+            </Button>
+            <Button size="sm" asChild>
+              <Link to="/signup">Get Started</Link>
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -84,8 +90,16 @@ export const Header = () => {
                   <Button variant="ghost" className="w-full">Join as Engineer</Button>
                 </Link>
                 <Link to="/find-services" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full">Find Services</Button>
+                  <Button variant="outline" className="w-full">Find Services</Button>
                 </Link>
+                <div className="space-y-2">
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>Sign In</Link>
+                  </Button>
+                  <Button size="sm" className="w-full" asChild>
+                    <Link to="/signup" onClick={() => setIsMenuOpen(false)}>Get Started</Link>
+                  </Button>
+                </div>
               </div>
             </nav>
           </div>
