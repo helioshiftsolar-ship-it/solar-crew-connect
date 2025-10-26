@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { AnalyticsDialog } from "@/components/AnalyticsDialog";
 import { 
   Calendar, 
   Users, 
@@ -77,6 +79,8 @@ const getStatusIcon = (status: string) => {
 };
 
 export default function Dashboard() {
+  const [analyticsOpen, setAnalyticsOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-background pt-16">
       <div className="container mx-auto px-4 py-8">
@@ -86,11 +90,14 @@ export default function Dashboard() {
             <h1 className="text-3xl font-bold text-foreground">Project Dashboard</h1>
             <p className="text-muted-foreground mt-1">Track your ongoing I&C teams, tools, and design services</p>
           </div>
-          <Button className="flex items-center gap-2">
+          <Button onClick={() => setAnalyticsOpen(true)} className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4" />
             View Analytics
           </Button>
         </div>
+
+        {/* Analytics Dialog */}
+        <AnalyticsDialog open={analyticsOpen} onOpenChange={setAnalyticsOpen} />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
