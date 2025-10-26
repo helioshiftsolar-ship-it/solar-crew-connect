@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import FindServices from "./pages/FindServices"; 
 import JoinNetwork from "./pages/JoinNetwork";
+import Pricing from "./pages/Pricing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import EngineerProfile from "./pages/EngineerProfile";
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/join" element={<JoinNetwork />} />
           <Route path="/services" element={<FindServices />} />
           <Route path="/how-it-works" element={<Index />} />
+          <Route path="/pricing" element={<Pricing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/engineer/:id" element={<EngineerProfile />} />
