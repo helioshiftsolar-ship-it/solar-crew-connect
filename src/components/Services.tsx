@@ -46,33 +46,52 @@ export const Services = () => {
           {services.map((service, index) => {
             const IconComponent = service.icon;
             return (
-              <Card key={index} className="p-8 hover:shadow-card-hover transition-shadow duration-300 border-border/50">
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-solar rounded-full mb-6">
-                    <IconComponent className="w-8 h-8 text-primary-foreground" />
+              <Card 
+                key={index} 
+                className="group relative p-8 transition-all duration-500 border-2 border-border/50 hover:border-primary/30 bg-gradient-to-br from-card via-card to-card/95 hover:shadow-[0_20px_60px_-15px_hsl(174_72%_56%_/_0.2)] overflow-hidden"
+              >
+                {/* Animated background gradient on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                {/* Decorative corner accent */}
+                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                <div className="relative text-center">
+                  {/* Enhanced icon with animation */}
+                  <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[hsl(174,72%,56%)] to-[hsl(174,65%,65%)] rounded-2xl mb-6 shadow-[0_8px_30px_-8px_hsl(174_72%_56%_/_0.3)] group-hover:shadow-[0_12px_40px_-10px_hsl(174_72%_56%_/_0.5)] group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                    <IconComponent className="w-10 h-10 text-primary-foreground group-hover:scale-110 transition-transform duration-500" />
                   </div>
                   
-                  <h3 className="text-xl font-semibold text-foreground mb-4">
+                  <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors duration-300">
                     {service.title}
                   </h3>
                   
-                  <p className="text-muted-foreground mb-6">
+                  <p className="text-muted-foreground mb-6 leading-relaxed">
                     {service.description}
                   </p>
                   
-                  <ul className="space-y-2 mb-8">
+                  {/* Feature list with enhanced styling */}
+                  <ul className="space-y-3 mb-8">
                     {service.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                        <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                        {feature}
+                      <li 
+                        key={featureIndex} 
+                        className="flex items-center justify-center gap-3 text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-300"
+                        style={{ transitionDelay: `${featureIndex * 50}ms` }}
+                      >
+                        <div className="w-2 h-2 bg-gradient-to-br from-primary to-accent rounded-full group-hover:scale-125 transition-transform duration-300" />
+                        <span className="font-medium">{feature}</span>
                       </li>
                     ))}
                   </ul>
                   
-                  <Button variant="outline" className="group">
+                  {/* Enhanced button */}
+                  <Button 
+                    variant="outline" 
+                    className="group/btn border-2 hover:border-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm hover:shadow-md"
+                  >
                     <Link to="/find-services" className="flex items-center">
                       Learn More
-                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="ml-2 w-4 h-4 group-hover/btn:translate-x-2 transition-transform duration-300" />
                     </Link>
                   </Button>
                 </div>
