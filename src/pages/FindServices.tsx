@@ -2,6 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
 import { 
   Search, 
   MapPin, 
@@ -136,6 +139,35 @@ const getTypeColor = (type: string) => {
 export default function FindServices() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("All");
+  
+  // Filter states
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const [selectedAvailability, setSelectedAvailability] = useState<string[]>([]);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [selectedExperience, setSelectedExperience] = useState<string[]>([]);
+
+  // Available filter options
+  const locations = ["Phoenix, AZ", "Los Angeles, CA", "San Diego, CA", "Austin, TX", "Denver, CO"];
+  const availabilityOptions = ["Available Now", "2-3 weeks", "1 month+"];
+  const serviceOptions = ["I&C Team", "Solar Design", "Tools", "Engineering"];
+  const experienceOptions = ["Entry (0-2 years)", "Mid (3-5 years)", "Senior (5-10 years)", "Expert (10+ years)"];
+
+  const toggleFilter = (value: string, selectedArray: string[], setFunction: React.Dispatch<React.SetStateAction<string[]>>) => {
+    if (selectedArray.includes(value)) {
+      setFunction(selectedArray.filter(item => item !== value));
+    } else {
+      setFunction([...selectedArray, value]);
+    }
+  };
+
+  const clearAllFilters = () => {
+    setSelectedLocations([]);
+    setSelectedAvailability([]);
+    setSelectedServices([]);
+    setSelectedExperience([]);
+  };
+
+  const activeFiltersCount = selectedLocations.length + selectedAvailability.length + selectedServices.length + selectedExperience.length;
 
   useEffect(() => {
     document.title = "Find Solar Services & Engineers | SolarConnect";
@@ -182,10 +214,133 @@ export default function FindServices() {
                 className="pl-10"
               />
             </div>
-            <Button variant="outline" className="flex items-center gap-2">
-              <Filter className="w-4 h-4" />
-              Filters
-            </Button>
+            
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="flex items-center gap-2 relative">
+                  <Filter className="w-4 h-4" />
+                  Filters
+                  {activeFiltersCount > 0 && (
+                    <Badge className="ml-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                      {activeFiltersCount}
+                    </Badge>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 pointer-events-auto" align="end">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-sm">Filters</h4>
+                    {activeFiltersCount > 0 && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={clearAllFilters}
+                        className="h-auto p-1 text-xs"
+                      >
+                        Clear All
+                      </Button>
+                    )}
+                  </div>
+                  
+                  <Separator />
+
+                  {/* Location Filter */}
+                  <div>
+                    <h5 className="font-medium text-sm mb-3">Location</h5>
+                    <div className="space-y-2">
+                      {locations.map((location) => (
+                        <div key={location} className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`location-${location}`}
+                            checked={selectedLocations.includes(location)}
+                            onCheckedChange={() => toggleFilter(location, selectedLocations, setSelectedLocations)}
+                          />
+                          <label 
+                            htmlFor={`location-${location}`}
+                            className="text-sm cursor-pointer"
+                          >
+                            {location}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Availability Filter */}
+                  <div>
+                    <h5 className="font-medium text-sm mb-3">Availability</h5>
+                    <div className="space-y-2">
+                      {availabilityOptions.map((option) => (
+                        <div key={option} className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`availability-${option}`}
+                            checked={selectedAvailability.includes(option)}
+                            onCheckedChange={() => toggleFilter(option, selectedAvailability, setSelectedAvailability)}
+                          />
+                          <label 
+                            htmlFor={`availability-${option}`}
+                            className="text-sm cursor-pointer"
+                          >
+                            {option}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Service Type Filter */}
+                  <div>
+                    <h5 className="font-medium text-sm mb-3">Service Type</h5>
+                    <div className="space-y-2">
+                      {serviceOptions.map((service) => (
+                        <div key={service} className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`service-${service}`}
+                            checked={selectedServices.includes(service)}
+                            onCheckedChange={() => toggleFilter(service, selectedServices, setSelectedServices)}
+                          />
+                          <label 
+                            htmlFor={`service-${service}`}
+                            className="text-sm cursor-pointer"
+                          >
+                            {service}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Experience Level Filter */}
+                  <div>
+                    <h5 className="font-medium text-sm mb-3">Experience Level</h5>
+                    <div className="space-y-2">
+                      {experienceOptions.map((exp) => (
+                        <div key={exp} className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`experience-${exp}`}
+                            checked={selectedExperience.includes(exp)}
+                            onCheckedChange={() => toggleFilter(exp, selectedExperience, setSelectedExperience)}
+                          />
+                          <label 
+                            htmlFor={`experience-${exp}`}
+                            className="text-sm cursor-pointer"
+                          >
+                            {exp}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
 
           {/* Service Type Filter */}
