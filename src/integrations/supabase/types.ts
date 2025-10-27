@@ -14,7 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      engineer_profiles: {
+        Row: {
+          availability: string
+          avatar_url: string | null
+          bio: string | null
+          certifications: string[]
+          created_at: string
+          email: string
+          full_name: string
+          hourly_rate: number | null
+          id: string
+          location: string
+          phone: string | null
+          rating: number
+          specialties: string[]
+          total_projects: number
+          updated_at: string
+          years_experience: number
+        }
+        Insert: {
+          availability: string
+          avatar_url?: string | null
+          bio?: string | null
+          certifications?: string[]
+          created_at?: string
+          email: string
+          full_name: string
+          hourly_rate?: number | null
+          id: string
+          location: string
+          phone?: string | null
+          rating?: number
+          specialties?: string[]
+          total_projects?: number
+          updated_at?: string
+          years_experience?: number
+        }
+        Update: {
+          availability?: string
+          avatar_url?: string | null
+          bio?: string | null
+          certifications?: string[]
+          created_at?: string
+          email?: string
+          full_name?: string
+          hourly_rate?: number | null
+          id?: string
+          location?: string
+          phone?: string | null
+          rating?: number
+          specialties?: string[]
+          total_projects?: number
+          updated_at?: string
+          years_experience?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
