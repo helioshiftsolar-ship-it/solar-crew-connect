@@ -19,12 +19,19 @@ import {
   Clock,
   DollarSign,
   FileText,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Building2,
+  Users,
+  Globe,
+  Package
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { ToolsGrid } from "@/components/ToolsGrid";
+import { ServicesGrid } from "@/components/ServicesGrid";
 
-interface EngineerProfile {
+interface Profile {
   id: string;
+  profile_type: 'individual_engineer' | 'tool_provider' | 'service_provider';
   full_name: string;
   email: string;
   phone?: string;
@@ -38,28 +45,53 @@ interface EngineerProfile {
   rating: number;
   total_projects: number;
   availability: 'available' | 'busy' | 'unavailable';
+  company_name?: string;
+  company_size?: string;
+  founded_year?: number;
+  website_url?: string;
 }
 
 export default function EngineerProfile() {
   const { id } = useParams();
-  const [profile, setProfile] = useState<EngineerProfile | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [tools, setTools] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchData = async () => {
       if (!id) return;
       
       try {
-        const { data, error } = await supabase
+        // Fetch profile
+        const { data: profileData, error: profileError } = await supabase
           .from('engineer_profiles')
           .select('*')
           .eq('id', id)
           .maybeSingle();
           
-        if (error) {
-          console.error('Error fetching profile:', error);
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
         } else {
-          setProfile(data);
+          setProfile(profileData as Profile);
+
+          // Fetch tools if tool provider
+          if (profileData?.profile_type === 'tool_provider') {
+            const { data: toolsData } = await supabase
+              .from('tools')
+              .select('*')
+              .eq('profile_id', id);
+            setTools(toolsData || []);
+          }
+
+          // Fetch services if service provider
+          if (profileData?.profile_type === 'service_provider') {
+            const { data: servicesData } = await supabase
+              .from('services')
+              .select('*')
+              .eq('profile_id', id);
+            setServices(servicesData || []);
+          }
         }
       } catch (error) {
         console.error('Error:', error);
@@ -68,7 +100,7 @@ export default function EngineerProfile() {
       }
     };
 
-    fetchProfile();
+    fetchData();
   }, [id]);
 
   if (loading) {
@@ -87,11 +119,14 @@ export default function EngineerProfile() {
       <div className="min-h-screen bg-background pt-16 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-foreground mb-2">Profile Not Found</h1>
-          <p className="text-muted-foreground">The engineer profile you're looking for doesn't exist.</p>
+          <p className="text-muted-foreground">The profile you're looking for doesn't exist.</p>
         </div>
       </div>
     );
   }
+
+  const isCompany = profile.profile_type !== 'individual_engineer';
+  const displayName = isCompany ? profile.company_name || profile.full_name : profile.full_name;
 
   const getAvailabilityColor = (availability: string) => {
     switch (availability) {
@@ -178,14 +213,20 @@ export default function EngineerProfile() {
           <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10" />
           <CardContent className="p-8 relative">
             <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-shrink-0">
+                <div className="flex-shrink-0">
                 <div className="relative">
-                  <Avatar className="w-32 h-32 border-4 border-background shadow-xl">
-                    <AvatarImage src={profile.avatar_url} alt={profile.full_name} />
-                    <AvatarFallback className="text-2xl bg-gradient-to-br from-primary to-accent text-primary-foreground">
-                      {profile.full_name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
+                  {isCompany ? (
+                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center border-4 border-background shadow-xl">
+                      <Building2 className="w-16 h-16 text-primary" />
+                    </div>
+                  ) : (
+                    <Avatar className="w-32 h-32 border-4 border-background shadow-xl">
+                      <AvatarImage src={profile.avatar_url} alt={displayName} />
+                      <AvatarFallback className="text-2xl bg-gradient-to-br from-primary to-accent text-primary-foreground">
+                        {displayName.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
                   <div className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full ${getAvailabilityColor(profile.availability)} border-4 border-background shadow-lg`}></div>
                 </div>
               </div>
@@ -194,17 +235,36 @@ export default function EngineerProfile() {
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <h1 className="text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text mb-2">
-                      {profile.full_name}
+                      {displayName}
                     </h1>
+                    {isCompany && profile.company_name && (
+                      <p className="text-lg text-muted-foreground mb-2">
+                        {profile.profile_type === 'tool_provider' ? 'Tool Provider' : 'Service Provider'}
+                      </p>
+                    )}
                     <div className="flex flex-wrap items-center gap-4 text-muted-foreground mb-3">
                       <div className="flex items-center gap-1">
                         <MapPin className="w-4 h-4" />
                         <span>{profile.location}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Briefcase className="w-4 h-4" />
-                        <span>{profile.years_experience} years experience</span>
-                      </div>
+                      {isCompany && profile.company_size && (
+                        <div className="flex items-center gap-1">
+                          <Users className="w-4 h-4" />
+                          <span>{profile.company_size}</span>
+                        </div>
+                      )}
+                      {isCompany && profile.founded_year && (
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4" />
+                          <span>Founded {profile.founded_year}</span>
+                        </div>
+                      )}
+                      {!isCompany && (
+                        <div className="flex items-center gap-1">
+                          <Briefcase className="w-4 h-4" />
+                          <span>{profile.years_experience} years experience</span>
+                        </div>
+                      )}
                       <Badge variant="secondary" className="capitalize">
                         {profile.availability}
                       </Badge>
@@ -227,12 +287,21 @@ export default function EngineerProfile() {
                 <div className="flex gap-3">
                   <Button className="flex items-center gap-2">
                     <Mail className="w-4 h-4" />
-                    Contact Engineer
+                    {isCompany ? 'Contact Company' : 'Contact Engineer'}
                   </Button>
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <ExternalLink className="w-4 h-4" />
-                    View Portfolio
-                  </Button>
+                  {profile.website_url ? (
+                    <Button variant="outline" className="flex items-center gap-2" asChild>
+                      <a href={profile.website_url} target="_blank" rel="noopener noreferrer">
+                        <Globe className="w-4 h-4" />
+                        Visit Website
+                      </a>
+                    </Button>
+                  ) : (
+                    <Button variant="outline" className="flex items-center gap-2">
+                      <ExternalLink className="w-4 h-4" />
+                      View Portfolio
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
@@ -353,8 +422,41 @@ export default function EngineerProfile() {
           </Card>
         </div>
 
+        {/* Tools Section (for tool providers) */}
+        {profile.profile_type === 'tool_provider' && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Package className="w-5 h-5" />
+                Our Tools & Products
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">Professional tools and equipment catalog</p>
+            </CardHeader>
+            <CardContent>
+              <ToolsGrid tools={tools} />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Services Section (for service providers) */}
+        {profile.profile_type === 'service_provider' && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Briefcase className="w-5 h-5" />
+                Our Services
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">Comprehensive solar services and solutions</p>
+            </CardHeader>
+            <CardContent>
+              <ServicesGrid services={services} />
+            </CardContent>
+          </Card>
+        )}
+
         {/* Portfolio Section */}
-        <Card className="mb-8">
+        {profile.profile_type === 'individual_engineer' && (
+          <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ImageIcon className="w-5 h-5" />
@@ -393,6 +495,7 @@ export default function EngineerProfile() {
             </div>
           </CardContent>
         </Card>
+        )}
 
         {/* Reviews Section */}
         <Card>

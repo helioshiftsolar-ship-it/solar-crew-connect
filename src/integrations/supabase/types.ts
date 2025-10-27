@@ -20,17 +20,22 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           certifications: string[]
+          company_name: string | null
+          company_size: string | null
           created_at: string
           email: string
+          founded_year: number | null
           full_name: string
           hourly_rate: number | null
           id: string
           location: string
           phone: string | null
+          profile_type: string
           rating: number
           specialties: string[]
           total_projects: number
           updated_at: string
+          website_url: string | null
           years_experience: number
         }
         Insert: {
@@ -38,17 +43,22 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           certifications?: string[]
+          company_name?: string | null
+          company_size?: string | null
           created_at?: string
           email: string
+          founded_year?: number | null
           full_name: string
           hourly_rate?: number | null
           id: string
           location: string
           phone?: string | null
+          profile_type?: string
           rating?: number
           specialties?: string[]
           total_projects?: number
           updated_at?: string
+          website_url?: string | null
           years_experience?: number
         }
         Update: {
@@ -56,20 +66,149 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           certifications?: string[]
+          company_name?: string | null
+          company_size?: string | null
           created_at?: string
           email?: string
+          founded_year?: number | null
           full_name?: string
           hourly_rate?: number | null
           id?: string
           location?: string
           phone?: string | null
+          profile_type?: string
           rating?: number
           specialties?: string[]
           total_projects?: number
           updated_at?: string
+          website_url?: string | null
           years_experience?: number
         }
         Relationships: []
+      }
+      services: {
+        Row: {
+          case_study_url: string | null
+          category: string
+          created_at: string
+          description: string
+          duration_estimate: string | null
+          features: string[]
+          id: string
+          image_url: string | null
+          name: string
+          price_model: string
+          price_range: string | null
+          profile_id: string
+          rating: number | null
+          total_completed: number | null
+          updated_at: string
+        }
+        Insert: {
+          case_study_url?: string | null
+          category: string
+          created_at?: string
+          description: string
+          duration_estimate?: string | null
+          features?: string[]
+          id?: string
+          image_url?: string | null
+          name: string
+          price_model: string
+          price_range?: string | null
+          profile_id: string
+          rating?: number | null
+          total_completed?: number | null
+          updated_at?: string
+        }
+        Update: {
+          case_study_url?: string | null
+          category?: string
+          created_at?: string
+          description?: string
+          duration_estimate?: string | null
+          features?: string[]
+          id?: string
+          image_url?: string | null
+          name?: string
+          price_model?: string
+          price_range?: string | null
+          profile_id?: string
+          rating?: number | null
+          total_completed?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "engineer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tools: {
+        Row: {
+          category: string
+          created_at: string
+          demo_url: string | null
+          description: string
+          documentation_url: string | null
+          features: string[]
+          id: string
+          image_url: string | null
+          name: string
+          price_model: string
+          price_range: string | null
+          profile_id: string
+          rating: number | null
+          total_users: number | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          demo_url?: string | null
+          description: string
+          documentation_url?: string | null
+          features?: string[]
+          id?: string
+          image_url?: string | null
+          name: string
+          price_model: string
+          price_range?: string | null
+          profile_id: string
+          rating?: number | null
+          total_users?: number | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          demo_url?: string | null
+          description?: string
+          documentation_url?: string | null
+          features?: string[]
+          id?: string
+          image_url?: string | null
+          name?: string
+          price_model?: string
+          price_range?: string | null
+          profile_id?: string
+          rating?: number | null
+          total_users?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tools_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "engineer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
