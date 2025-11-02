@@ -28,6 +28,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { ToolsGrid } from "@/components/ToolsGrid";
 import { ServicesGrid } from "@/components/ServicesGrid";
+import { CreateDealDialog } from "@/components/CreateDealDialog";
 
 interface Profile {
   id: string;
@@ -57,6 +58,7 @@ export default function EngineerProfile() {
   const [tools, setTools] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dealDialogOpen, setDealDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -285,9 +287,12 @@ export default function EngineerProfile() {
                 )}
                 
                 <div className="flex gap-3">
-                  <Button className="flex items-center gap-2">
+                  <Button 
+                    className="flex items-center gap-2"
+                    onClick={() => setDealDialogOpen(true)}
+                  >
                     <Mail className="w-4 h-4" />
-                    {isCompany ? 'Contact Company' : 'Contact Engineer'}
+                    Create Deal
                   </Button>
                   {profile.website_url ? (
                     <Button variant="outline" className="flex items-center gap-2" asChild>
@@ -303,6 +308,15 @@ export default function EngineerProfile() {
                     </Button>
                   )}
                 </div>
+
+                {/* Create Deal Dialog */}
+                <CreateDealDialog
+                  open={dealDialogOpen}
+                  onOpenChange={setDealDialogOpen}
+                  providerId={profile.id}
+                  providerName={displayName}
+                  providerType={profile.profile_type}
+                />
               </div>
             </div>
           </CardContent>

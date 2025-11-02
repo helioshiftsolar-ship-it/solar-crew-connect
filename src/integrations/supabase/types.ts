@@ -14,6 +14,77 @@ export type Database = {
   }
   public: {
     Tables: {
+      deals: {
+        Row: {
+          company_email: string | null
+          company_name: string
+          completion_date: string | null
+          contact_phone: string | null
+          created_at: string
+          deal_type: string
+          deal_value: number | null
+          id: string
+          location: string | null
+          notes: string | null
+          project_id: string
+          project_title: string
+          provider_id: string
+          provider_name: string
+          provider_type: string
+          start_date: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_email?: string | null
+          company_name: string
+          completion_date?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          deal_type: string
+          deal_value?: number | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          project_id: string
+          project_title: string
+          provider_id: string
+          provider_name: string
+          provider_type: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company_email?: string | null
+          company_name?: string
+          completion_date?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          deal_type?: string
+          deal_value?: number | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          project_id?: string
+          project_title?: string
+          provider_id?: string
+          provider_name?: string
+          provider_type?: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deals_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "engineer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       engineer_profiles: {
         Row: {
           availability: string

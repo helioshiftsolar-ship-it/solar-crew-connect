@@ -6,7 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Header } from "@/components/Header";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
-import FindServices from "./pages/FindServices"; 
+import FindServices from "./pages/FindServices";
+import Deals from "./pages/Deals";
 import JoinNetwork from "./pages/JoinNetwork";
 import Pricing from "./pages/Pricing";
 import Login from "./pages/Login";
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/find-services" element={<FindServices />} />
+          <Route path="/deals" element={<Deals />} />
           <Route path="/join" element={<JoinNetwork />} />
           <Route path="/services" element={<FindServices />} />
           <Route path="/how-it-works" element={<Index />} />

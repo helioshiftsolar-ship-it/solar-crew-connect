@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { AnalyticsDialog } from "@/components/AnalyticsDialog";
+import { ProjectDetailsDialog } from "@/components/ProjectDetailsDialog";
 import { 
   Calendar, 
   Users, 
@@ -80,6 +81,24 @@ const getStatusIcon = (status: string) => {
 
 export default function Dashboard() {
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<typeof projects[0] | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
+  const handleViewDetails = (project: typeof projects[0]) => {
+    setSelectedProject(project);
+    setDetailsOpen(true);
+  };
+
+  const handleMessageTeam = (project: typeof projects[0]) => {
+    const message = `Hi ${project.team}, regarding project ${project.title} (${project.id})`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const handleCall = (project: typeof projects[0]) => {
+    // In a real app, this would initiate a call through your communication system
+    alert(`Initiating call with ${project.team} for project ${project.title}`);
+  };
 
   return (
     <div className="min-h-screen bg-background pt-16">
@@ -98,6 +117,13 @@ export default function Dashboard() {
 
         {/* Analytics Dialog */}
         <AnalyticsDialog open={analyticsOpen} onOpenChange={setAnalyticsOpen} />
+
+        {/* Project Details Dialog */}
+        <ProjectDetailsDialog
+          project={selectedProject}
+          open={detailsOpen}
+          onOpenChange={setDetailsOpen}
+        />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -214,15 +240,30 @@ export default function Dashboard() {
                   </div>
                   
                   <div className="flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm" className="flex items-center gap-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex items-center gap-1"
+                      onClick={() => handleViewDetails(project)}
+                    >
                       <FileText className="w-3 h-3" />
                       View Details
                     </Button>
-                    <Button variant="outline" size="sm" className="flex items-center gap-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex items-center gap-1"
+                      onClick={() => handleMessageTeam(project)}
+                    >
                       <MessageCircle className="w-3 h-3" />
                       Message Team
                     </Button>
-                    <Button variant="outline" size="sm" className="flex items-center gap-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex items-center gap-1"
+                      onClick={() => handleCall(project)}
+                    >
                       <Phone className="w-3 h-3" />
                       Call
                     </Button>
