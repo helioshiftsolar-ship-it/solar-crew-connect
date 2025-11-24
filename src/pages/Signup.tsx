@@ -19,13 +19,26 @@ export default function Signup() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!userType) {
+      toast({
+        title: "Account Type Required",
+        description: "Please select whether you're a company or provider.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
 
     try {
+      const redirectUrl = `${window.location.origin}/`;
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
+          emailRedirectTo: redirectUrl,
           data: {
             full_name: fullName,
             user_type: userType,
@@ -40,9 +53,19 @@ export default function Signup() {
           variant: "destructive",
         });
       } else if (data.user) {
+        // Insert user role
+        const role = userType === 'epc_company' ? 'company' : 'provider';
+        const { error: roleError } = await supabase
+          .from('user_roles' as any)
+          .insert({ user_id: data.user.id, role } as any);
+
+        if (roleError) {
+          console.error('Failed to set user role:', roleError);
+        }
+
         toast({
           title: "Account Created!",
-          description: "Please check your email to verify your account.",
+          description: "You can now sign in to your account.",
         });
         navigate("/login");
       }
