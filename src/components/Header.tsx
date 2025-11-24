@@ -1,19 +1,25 @@
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
-import { Zap, Menu, X } from "lucide-react";
+import { Zap, Menu, X, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
-  const navItems = [
+  const publicNavItems = [
     { label: "Services", href: "/services" },
     { label: "How It Works", href: "/how-it-works" },
     { label: "Pricing", href: "/pricing" },
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Deals", href: "/deals" },
   ];
+  
+  const authenticatedNavItems = [
+    { label: "Dashboard", href: "/dashboard" },
+  ];
+  
+  const navItems = user ? authenticatedNavItems : publicNavItems;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
@@ -46,18 +52,27 @@ export const Header = () => {
 
           {/* Desktop CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <Link to="/join">
-              <Button variant="ghost">Join as Engineer</Button>
-            </Link>
-            <Link to="/find-services">
-              <Button variant="outline">Find Services</Button>
-            </Link>
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/login">Sign In</Link>
-            </Button>
-            <Button size="sm" asChild>
-              <Link to="/signup">Get Started</Link>
-            </Button>
+            {user ? (
+              <Button variant="outline" size="sm" onClick={signOut}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
+            ) : (
+              <>
+                <Link to="/join">
+                  <Button variant="ghost">Join as Engineer</Button>
+                </Link>
+                <Link to="/find-services">
+                  <Button variant="outline">Find Services</Button>
+                </Link>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/login">Sign In</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link to="/signup">Get Started</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -88,20 +103,36 @@ export const Header = () => {
                 </Link>
               ))}
               <div className="flex flex-col gap-2 mt-4">
-                <Link to="/join" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="ghost" className="w-full">Join as Engineer</Button>
-                </Link>
-                <Link to="/find-services" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="outline" className="w-full">Find Services</Button>
-                </Link>
-                <div className="space-y-2">
-                  <Button variant="outline" size="sm" className="w-full" asChild>
-                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>Sign In</Link>
+                {user ? (
+                  <Button 
+                    variant="outline" 
+                    className="w-full" 
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      signOut();
+                    }}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
                   </Button>
-                  <Button size="sm" className="w-full" asChild>
-                    <Link to="/signup" onClick={() => setIsMenuOpen(false)}>Get Started</Link>
-                  </Button>
-                </div>
+                ) : (
+                  <>
+                    <Link to="/join" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full">Join as Engineer</Button>
+                    </Link>
+                    <Link to="/find-services" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" className="w-full">Find Services</Button>
+                    </Link>
+                    <div className="space-y-2">
+                      <Button variant="outline" size="sm" className="w-full" asChild>
+                        <Link to="/login" onClick={() => setIsMenuOpen(false)}>Sign In</Link>
+                      </Button>
+                      <Button size="sm" className="w-full" asChild>
+                        <Link to="/signup" onClick={() => setIsMenuOpen(false)}>Get Started</Link>
+                      </Button>
+                    </div>
+                  </>
+                )}
               </div>
             </nav>
           </div>
