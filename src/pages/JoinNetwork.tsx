@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -5,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   CheckCircle, 
   Users, 
@@ -12,7 +15,8 @@ import {
   Star, 
   Briefcase,
   Award,
-  TrendingUp
+  TrendingUp,
+  Gift
 } from "lucide-react";
 
 const benefits = [
@@ -46,9 +50,36 @@ const steps = [
 ];
 
 export default function JoinNetwork() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) {
+      setReferralCode(ref);
+      // Store in localStorage so signup page can use it
+      localStorage.setItem('referral_code', ref);
+    }
+  }, [searchParams]);
+
+  const handleJoinClick = () => {
+    navigate('/signup');
+  };
+
   return (
     <div className="min-h-screen bg-background pt-16">
       <div className="container mx-auto px-4 py-8">
+        {/* Referral Alert */}
+        {referralCode && (
+          <Alert className="mb-8 bg-gradient-to-r from-accent/10 to-primary/10 border-accent/50">
+            <Gift className="h-5 w-5 text-accent" />
+            <AlertDescription className="ml-2">
+              <span className="font-semibold">You've been referred!</span> Complete your signup to help your referrer earn 100 coins. 🎉
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-4">
@@ -114,112 +145,71 @@ export default function JoinNetwork() {
             </div>
           </div>
 
-          {/* Right Column - Registration Form */}
+          {/* Right Column - Call to Action */}
           <Card className="p-8">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Join Our Network</h2>
-              <p className="text-muted-foreground">Fill out your information to get started</p>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Ready to Join?</h2>
+              <p className="text-muted-foreground">Create your account and start connecting with opportunities</p>
             </div>
 
-            <form className="space-y-6">
-              {/* Personal Info */}
+            <div className="space-y-6">
+              {referralCode && (
+                <Alert className="bg-primary/5 border-primary/20">
+                  <Gift className="h-5 w-5 text-primary" />
+                  <AlertDescription className="ml-2">
+                    <div className="space-y-2">
+                      <p className="font-semibold">Referral Code Applied: <code className="px-2 py-1 bg-muted rounded">{referralCode}</code></p>
+                      <p className="text-sm text-muted-foreground">This will be automatically applied when you sign up!</p>
+                    </div>
+                  </AlertDescription>
+                </Alert>
+              )}
+
               <div className="space-y-4">
-                <h3 className="font-semibold text-foreground">Personal Information</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" placeholder="John" />
+                <div className="bg-muted/30 rounded-lg p-6 space-y-4">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-primary mt-0.5" />
+                    <div>
+                      <h3 className="font-semibold mb-1">Quick Setup</h3>
+                      <p className="text-sm text-muted-foreground">Create your account in under 2 minutes</p>
+                    </div>
                   </div>
-                  <div>
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" placeholder="Doe" />
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-primary mt-0.5" />
+                    <div>
+                      <h3 className="font-semibold mb-1">Start Earning</h3>
+                      <p className="text-sm text-muted-foreground">Get your wallet with 0 coins to start (earn more through referrals!)</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-primary mt-0.5" />
+                    <div>
+                      <h3 className="font-semibold mb-1">Instant Access</h3>
+                      <p className="text-sm text-muted-foreground">Connect with companies and opportunities immediately</p>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" type="email" placeholder="john@example.com" />
-                </div>
-                <div>
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input id="phone" type="tel" placeholder="+1 (555) 123-4567" />
-                </div>
-              </div>
 
-              {/* Professional Info */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-foreground">Professional Information</h3>
-                <div>
-                  <Label htmlFor="serviceType">Service Type</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select your service type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ic-team">I&C Team/Engineer</SelectItem>
-                      <SelectItem value="solar-design">Solar Design Engineer</SelectItem>
-                      <SelectItem value="equipment">Equipment Provider</SelectItem>
-                      <SelectItem value="consultant">Consultant</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="company">Company/Organization</Label>
-                  <Input id="company" placeholder="Your company name" />
-                </div>
-                <div>
-                  <Label htmlFor="experience">Years of Experience</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select experience level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0-2">0-2 years</SelectItem>
-                      <SelectItem value="3-5">3-5 years</SelectItem>
-                      <SelectItem value="6-10">6-10 years</SelectItem>
-                      <SelectItem value="10+">10+ years</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="location">Location</Label>
-                  <Input id="location" placeholder="City, State" />
-                </div>
-              </div>
+                <Button 
+                  onClick={handleJoinClick}
+                  className="w-full" 
+                  size="lg"
+                >
+                  Create Your Account
+                </Button>
 
-              {/* Additional Info */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-foreground">Additional Information</h3>
-                <div>
-                  <Label htmlFor="specialties">Specialties & Certifications</Label>
-                  <Textarea 
-                    id="specialties" 
-                    placeholder="List your key specialties, certifications, and areas of expertise..."
-                    className="h-24"
-                  />
-                </div>
+                <p className="text-center text-sm text-muted-foreground">
+                  Already have an account?{" "}
+                  <Button 
+                    variant="link" 
+                    className="p-0 h-auto"
+                    onClick={() => navigate('/login')}
+                  >
+                    Sign in here
+                  </Button>
+                </p>
               </div>
-
-              {/* Checkboxes */}
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="terms" />
-                  <Label htmlFor="terms" className="text-sm">
-                    I agree to the Terms of Service and Privacy Policy
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="marketing" />
-                  <Label htmlFor="marketing" className="text-sm">
-                    I'd like to receive updates about new opportunities and platform features
-                  </Label>
-                </div>
-              </div>
-
-              {/* Submit */}
-              <Button type="submit" className="w-full" size="lg">
-                Join SolarConnect Network
-              </Button>
-            </form>
+            </div>
           </Card>
         </div>
       </div>
