@@ -103,9 +103,12 @@ export type Database = {
           phone: string | null
           profile_type: string
           rating: number
+          referral_code: string | null
+          referred_by: string | null
           specialties: string[]
           total_projects: number
           updated_at: string
+          wallet_balance: number
           website_url: string | null
           years_experience: number
         }
@@ -126,9 +129,12 @@ export type Database = {
           phone?: string | null
           profile_type?: string
           rating?: number
+          referral_code?: string | null
+          referred_by?: string | null
           specialties?: string[]
           total_projects?: number
           updated_at?: string
+          wallet_balance?: number
           website_url?: string | null
           years_experience?: number
         }
@@ -149,13 +155,64 @@ export type Database = {
           phone?: string | null
           profile_type?: string
           rating?: number
+          referral_code?: string | null
+          referred_by?: string | null
           specialties?: string[]
           total_projects?: number
           updated_at?: string
+          wallet_balance?: number
           website_url?: string | null
           years_experience?: number
         }
         Relationships: []
+      }
+      referrals: {
+        Row: {
+          coins_awarded: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          referral_code: string
+          referred_profile_id: string
+          referrer_profile_id: string
+          status: string
+        }
+        Insert: {
+          coins_awarded?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code: string
+          referred_profile_id: string
+          referrer_profile_id: string
+          status?: string
+        }
+        Update: {
+          coins_awarded?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code?: string
+          referred_profile_id?: string
+          referrer_profile_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_profile_id_fkey"
+            columns: ["referred_profile_id"]
+            isOneToOne: false
+            referencedRelation: "engineer_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_profile_id_fkey"
+            columns: ["referrer_profile_id"]
+            isOneToOne: false
+            referencedRelation: "engineer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       services: {
         Row: {
@@ -281,12 +338,51 @@ export type Database = {
           },
         ]
       }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          profile_id: string
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          profile_id: string
+          transaction_type: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          profile_id?: string
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "engineer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_referral_code: { Args: never; Returns: string }
+      process_referral: {
+        Args: { new_profile_id: string; referral_code_used: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
