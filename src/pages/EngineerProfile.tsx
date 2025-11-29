@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Star, 
   MapPin, 
@@ -23,7 +24,11 @@ import {
   Building2,
   Users,
   Globe,
-  Package
+  Package,
+  Wallet,
+  Copy,
+  Share2,
+  Gift
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ToolsGrid } from "@/components/ToolsGrid";
@@ -50,15 +55,21 @@ interface Profile {
   company_size?: string;
   founded_year?: number;
   website_url?: string;
+  wallet_balance?: number;
+  referral_code?: string;
+  referred_by?: string;
 }
 
 export default function EngineerProfile() {
   const { id } = useParams();
+  const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [tools, setTools] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [dealDialogOpen, setDealDialogOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [transactions, setTransactions] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -94,6 +105,15 @@ export default function EngineerProfile() {
               .eq('profile_id', id);
             setServices(servicesData || []);
           }
+
+          // Fetch wallet transactions
+          const { data: transactionsData } = await supabase
+            .from('wallet_transactions')
+            .select('*')
+            .eq('profile_id', id)
+            .order('created_at', { ascending: false })
+            .limit(10);
+          setTransactions(transactionsData || []);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -206,6 +226,39 @@ export default function EngineerProfile() {
     { label: "Avg Response Time", value: "2 hours", icon: Clock },
     { label: "Success Rate", value: "98%", icon: Star }
   ];
+
+  const copyReferralLink = () => {
+    if (profile?.referral_code) {
+      const referralLink = `${window.location.origin}/join-network?ref=${profile.referral_code}`;
+      navigator.clipboard.writeText(referralLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      toast({
+        title: "Link Copied!",
+        description: "Referral link copied to clipboard",
+      });
+    }
+  };
+
+  const shareReferral = async () => {
+    if (profile?.referral_code) {
+      const referralLink = `${window.location.origin}/join-network?ref=${profile.referral_code}`;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'Join Solar Marketplace',
+            text: 'Join our solar engineering network and get rewarded!',
+            url: referralLink,
+          });
+        } catch (err) {
+          console.log('Share failed:', err);
+          copyReferralLink();
+        }
+      } else {
+        copyReferralLink();
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 pt-16">
@@ -433,6 +486,105 @@ export default function EngineerProfile() {
                 </div>
               </div>
             </CardContent>
+          </Card>
+        </div>
+
+        {/* Wallet & Referral Section */}
+        <div className="grid lg:grid-cols-2 gap-8 mb-8">
+          {/* Wallet Card */}
+          <Card className="overflow-hidden">
+            <div className="bg-gradient-to-br from-primary/10 via-accent/5 to-primary/5 p-6">
+              <CardHeader className="p-0 pb-4">
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  <Wallet className="w-6 h-6 text-primary" />
+                  Wallet Balance
+                </CardTitle>
+              </CardHeader>
+              <div className="text-center py-6">
+                <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-background/80 backdrop-blur-sm mb-4 shadow-lg">
+                  <div className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    {profile.wallet_balance || 0}
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground">Virtual Coins</p>
+                <p className="text-xs text-muted-foreground mt-2">Use coins to renew your subscription</p>
+              </div>
+            </div>
+            
+            {transactions.length > 0 && (
+              <CardContent className="pt-6">
+                <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4" />
+                  Recent Transactions
+                </h4>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {transactions.map((tx: any) => (
+                    <div key={tx.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/50">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium capitalize">{tx.transaction_type.replace(/_/g, ' ')}</p>
+                        {tx.description && (
+                          <p className="text-xs text-muted-foreground truncate">{tx.description}</p>
+                        )}
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {new Date(tx.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className={`text-lg font-bold ${tx.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {tx.amount > 0 ? '+' : ''}{tx.amount}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            )}
+          </Card>
+
+          {/* Referral Card */}
+          <Card className="overflow-hidden">
+            <div className="bg-gradient-to-br from-accent/10 via-primary/5 to-accent/5 p-6">
+              <CardHeader className="p-0 pb-4">
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  <Gift className="w-6 h-6 text-accent" />
+                  Refer & Earn
+                </CardTitle>
+              </CardHeader>
+              <div className="space-y-4">
+                <div className="bg-background/80 backdrop-blur-sm p-4 rounded-lg border border-border/50">
+                  <p className="text-sm text-muted-foreground mb-2">Your Referral Code</p>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 text-2xl font-mono font-bold bg-muted/50 px-4 py-3 rounded border border-border">
+                      {profile.referral_code || 'LOADING...'}
+                    </code>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 gap-2"
+                    onClick={copyReferralLink}
+                  >
+                    <Copy className="w-4 h-4" />
+                    {copied ? 'Copied!' : 'Copy Link'}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 gap-2"
+                    onClick={shareReferral}
+                  >
+                    <Share2 className="w-4 h-4" />
+                    Share
+                  </Button>
+                </div>
+                
+                <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
+                  <p className="text-sm font-semibold text-accent-foreground mb-2">💰 Earn 100 Coins Per Referral!</p>
+                  <p className="text-xs text-muted-foreground">
+                    Share your referral link with other solar professionals. When they join and complete their profile, you'll earn 100 coins automatically!
+                  </p>
+                </div>
+              </div>
+            </div>
           </Card>
         </div>
 

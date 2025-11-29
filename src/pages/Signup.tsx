@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Gift } from "lucide-react";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -14,8 +16,17 @@ export default function Signup() {
   const [fullName, setFullName] = useState("");
   const [userType, setUserType] = useState("");
   const [loading, setLoading] = useState(false);
+  const [referralCode, setReferralCode] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check for referral code in localStorage
+    const storedRef = localStorage.getItem('referral_code');
+    if (storedRef) {
+      setReferralCode(storedRef);
+    }
+  }, []);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,9 +74,54 @@ export default function Signup() {
           console.error('Failed to set user role:', roleError);
         }
 
+        // If user is a provider (engineer) and has a referral code, create profile and process referral
+        if (role === 'provider' && referralCode) {
+          try {
+            // Create engineer profile with referral code
+            const { data: profileData, error: profileError } = await supabase
+              .from('engineer_profiles')
+              .insert({
+                id: `profile-${data.user.id}`,
+                full_name: fullName,
+                email: email,
+                location: 'Not specified',
+                years_experience: 0,
+                specialties: [],
+                certifications: [],
+                rating: 0,
+                total_projects: 0,
+                availability: 'available',
+                profile_type: 'individual_engineer',
+                referred_by: referralCode,
+                wallet_balance: 0
+              })
+              .select()
+              .single();
+
+            if (!profileError && profileData) {
+              // Process the referral to award coins to referrer
+              const { error: referralError } = await supabase.rpc('process_referral', {
+                new_profile_id: profileData.id,
+                referral_code_used: referralCode
+              });
+
+              if (referralError) {
+                console.error('Failed to process referral:', referralError);
+              }
+
+              // Clear referral code from localStorage
+              localStorage.removeItem('referral_code');
+            }
+          } catch (err) {
+            console.error('Error creating profile with referral:', err);
+          }
+        }
+
         toast({
           title: "Account Created!",
-          description: "You can now sign in to your account.",
+          description: referralCode 
+            ? "Your account has been created and your referrer has been rewarded!" 
+            : "You can now sign in to your account.",
         });
         navigate("/login");
       }
@@ -88,6 +144,14 @@ export default function Signup() {
           <CardDescription>Create your account to get started</CardDescription>
         </CardHeader>
         <CardContent>
+          {referralCode && (
+            <Alert className="mb-4 bg-gradient-to-r from-accent/10 to-primary/10 border-accent/50">
+              <Gift className="h-5 w-5 text-accent" />
+              <AlertDescription className="ml-2">
+                <span className="font-semibold">Referral code active!</span> Your referrer will earn 100 coins when you complete signup.
+              </AlertDescription>
+            </Alert>
+          )}
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="fullName">Full Name</Label>
