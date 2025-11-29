@@ -74,10 +74,10 @@ export default function Signup() {
           console.error('Failed to set user role:', roleError);
         }
 
-        // If user is a provider (engineer) and has a referral code, create profile and process referral
-        if (role === 'provider' && referralCode) {
+        // If user is a provider (engineer), create their profile
+        if (role === 'provider') {
           try {
-            // Create engineer profile with referral code
+            // Create engineer profile
             const { data: profileData, error: profileError } = await supabase
               .from('engineer_profiles')
               .insert({
@@ -92,28 +92,32 @@ export default function Signup() {
                 total_projects: 0,
                 availability: 'available',
                 profile_type: 'individual_engineer',
-                referred_by: referralCode,
+                referred_by: referralCode || null,
                 wallet_balance: 0
               })
               .select()
               .single();
 
             if (!profileError && profileData) {
-              // Process the referral to award coins to referrer
-              const { error: referralError } = await supabase.rpc('process_referral', {
-                new_profile_id: profileData.id,
-                referral_code_used: referralCode
-              });
+              // If there's a referral code, process it to award coins to referrer
+              if (referralCode) {
+                const { error: referralError } = await supabase.rpc('process_referral', {
+                  new_profile_id: profileData.id,
+                  referral_code_used: referralCode
+                });
 
-              if (referralError) {
-                console.error('Failed to process referral:', referralError);
+                if (referralError) {
+                  console.error('Failed to process referral:', referralError);
+                }
+
+                // Clear referral code from localStorage
+                localStorage.removeItem('referral_code');
               }
-
-              // Clear referral code from localStorage
-              localStorage.removeItem('referral_code');
+            } else if (profileError) {
+              console.error('Failed to create profile:', profileError);
             }
           } catch (err) {
-            console.error('Error creating profile with referral:', err);
+            console.error('Error creating profile:', err);
           }
         }
 
