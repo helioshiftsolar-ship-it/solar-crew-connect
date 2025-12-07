@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { ProjectManagementDialog } from "@/components/ProjectManagementDialog";
+import { EditProfileDialog } from "@/components/EditProfileDialog";
 import { 
   Loader2, 
   CheckCircle, 
@@ -61,6 +62,10 @@ interface Profile {
   location: string;
   specialties: string[];
   certifications: string[];
+  bio?: string;
+  phone?: string;
+  hourly_rate?: number;
+  years_experience?: number;
 }
 
 const getStatusColor = (status: string) => {
@@ -256,9 +261,14 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-background pt-16">
         <div className="container mx-auto px-4 py-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">My Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back, {profile?.full_name || user?.email}</p>
+          <div className="mb-8 flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">My Dashboard</h1>
+              <p className="text-muted-foreground">Welcome back, {profile?.full_name || user?.email}</p>
+            </div>
+            {profile && (
+              <EditProfileDialog profile={profile} onProfileUpdated={fetchProfile} />
+            )}
           </div>
 
           {/* Profile Analytics */}
