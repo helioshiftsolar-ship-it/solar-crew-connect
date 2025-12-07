@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       deals: {
         Row: {
+          accepted_at: string | null
           company_email: string | null
           company_name: string
           completion_date: string | null
@@ -24,9 +25,14 @@ export type Database = {
           deal_type: string
           deal_value: number | null
           id: string
+          last_update_at: string | null
           location: string | null
+          milestones: Json | null
           notes: string | null
+          progress: number | null
           project_id: string
+          project_images: string[] | null
+          project_status: string | null
           project_title: string
           provider_id: string
           provider_name: string
@@ -36,6 +42,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          accepted_at?: string | null
           company_email?: string | null
           company_name: string
           completion_date?: string | null
@@ -44,9 +51,14 @@ export type Database = {
           deal_type: string
           deal_value?: number | null
           id?: string
+          last_update_at?: string | null
           location?: string | null
+          milestones?: Json | null
           notes?: string | null
+          progress?: number | null
           project_id: string
+          project_images?: string[] | null
+          project_status?: string | null
           project_title: string
           provider_id: string
           provider_name: string
@@ -56,6 +68,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          accepted_at?: string | null
           company_email?: string | null
           company_name?: string
           completion_date?: string | null
@@ -64,9 +77,14 @@ export type Database = {
           deal_type?: string
           deal_value?: number | null
           id?: string
+          last_update_at?: string | null
           location?: string | null
+          milestones?: Json | null
           notes?: string | null
+          progress?: number | null
           project_id?: string
+          project_images?: string[] | null
+          project_status?: string | null
           project_title?: string
           provider_id?: string
           provider_name?: string
