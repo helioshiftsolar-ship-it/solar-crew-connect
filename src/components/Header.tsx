@@ -1,13 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
-import { Zap, Menu, X, LogOut } from "lucide-react";
+import { Zap, Menu, X, LogOut, User } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  const { user, signOut } = useAuth();
+  const { user, userRole, signOut } = useAuth();
 
   const publicNavItems = [
     { label: "Services", href: "/services" },
@@ -16,10 +16,18 @@ export const Header = () => {
   ];
   
   const authenticatedNavItems = [
+    { label: "Home", href: "/" },
     { label: "Dashboard", href: "/dashboard" },
+    { label: "Deals", href: "/deals" },
+    { label: "Services", href: "/services" },
   ];
   
-  const navItems = user ? authenticatedNavItems : publicNavItems;
+  // Add profile link for providers
+  const providerNavItems = userRole === 'provider' 
+    ? [...authenticatedNavItems, { label: "My Profile", href: `/profile/profile-${user?.id}` }]
+    : authenticatedNavItems;
+  
+  const navItems = user ? providerNavItems : publicNavItems;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
