@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { Loader2, Plus, X } from "lucide-react";
 
 interface Milestone {
@@ -49,6 +50,7 @@ export function CreateDealDialog({
   providerType,
 }: CreateDealDialogProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [newMilestone, setNewMilestone] = useState("");
@@ -91,6 +93,7 @@ export function CreateDealDialog({
         company_name: formData.companyName,
         company_email: formData.companyEmail || null,
         contact_phone: formData.contactPhone || null,
+        company_id: user?.id, // Add company_id for RLS
         provider_id: providerId,
         provider_name: providerName,
         provider_type: providerType,

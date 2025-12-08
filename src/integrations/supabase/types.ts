@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           accepted_at: string | null
           company_email: string | null
+          company_id: string | null
           company_name: string
           completion_date: string | null
           contact_phone: string | null
@@ -37,6 +38,7 @@ export type Database = {
           provider_id: string
           provider_name: string
           provider_type: string
+          provider_updates: string[] | null
           start_date: string | null
           status: string
           updated_at: string
@@ -44,6 +46,7 @@ export type Database = {
         Insert: {
           accepted_at?: string | null
           company_email?: string | null
+          company_id?: string | null
           company_name: string
           completion_date?: string | null
           contact_phone?: string | null
@@ -63,6 +66,7 @@ export type Database = {
           provider_id: string
           provider_name: string
           provider_type: string
+          provider_updates?: string[] | null
           start_date?: string | null
           status?: string
           updated_at?: string
@@ -70,6 +74,7 @@ export type Database = {
         Update: {
           accepted_at?: string | null
           company_email?: string | null
+          company_id?: string | null
           company_name?: string
           completion_date?: string | null
           contact_phone?: string | null
@@ -89,6 +94,7 @@ export type Database = {
           provider_id?: string
           provider_name?: string
           provider_type?: string
+          provider_updates?: string[] | null
           start_date?: string | null
           status?: string
           updated_at?: string
