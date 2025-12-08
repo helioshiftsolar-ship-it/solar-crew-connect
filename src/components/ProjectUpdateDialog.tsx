@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -19,7 +19,9 @@ import {
   Clock,
   MapPin,
   DollarSign,
-  Calendar
+  Calendar,
+  X,
+  Loader2
 } from 'lucide-react';
 
 interface Milestone {
@@ -63,7 +65,10 @@ export const ProjectUpdateDialog = ({
   const [progress, setProgress] = useState(0);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [newMilestone, setNewMilestone] = useState('');
+  const [projectImages, setProjectImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { userRole } = useAuth();
 
@@ -72,6 +77,7 @@ export const ProjectUpdateDialog = ({
       setProjectStatus(deal.project_status || 'not_started');
       setProgress(deal.progress || 0);
       setMilestones(deal.milestones || []);
+      setProjectImages(deal.project_images || []);
     }
   }, [deal]);
 
@@ -88,13 +94,12 @@ export const ProjectUpdateDialog = ({
   };
 
   const toggleMilestone = (id: string) => {
-    setMilestones(milestones.map(m => 
-      m.id === id ? { ...m, completed: !m.completed } : m
-    ));
-    // Update progress based on completed milestones
     const updatedMilestones = milestones.map(m => 
       m.id === id ? { ...m, completed: !m.completed } : m
     );
+    setMilestones(updatedMilestones);
+    
+    // Update progress based on completed milestones
     const completedCount = updatedMilestones.filter(m => m.completed).length;
     if (updatedMilestones.length > 0) {
       setProgress(Math.round((completedCount / updatedMilestones.length) * 100));
@@ -102,7 +107,64 @@ export const ProjectUpdateDialog = ({
   };
 
   const removeMilestone = (id: string) => {
-    setMilestones(milestones.filter(m => m.id !== id));
+    const updatedMilestones = milestones.filter(m => m.id !== id);
+    setMilestones(updatedMilestones);
+    
+    // Recalculate progress
+    const completedCount = updatedMilestones.filter(m => m.completed).length;
+    if (updatedMilestones.length > 0) {
+      setProgress(Math.round((completedCount / updatedMilestones.length) * 100));
+    } else {
+      setProgress(0);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !deal) return;
+
+    setUploading(true);
+    const uploadedUrls: string[] = [];
+
+    try {
+      for (const file of Array.from(files)) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${deal.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+        const { error: uploadError, data } = await supabase.storage
+          .from('project-images')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('project-images')
+          .getPublicUrl(fileName);
+
+        uploadedUrls.push(publicUrl);
+      }
+
+      setProjectImages([...projectImages, ...uploadedUrls]);
+      toast({
+        title: 'Images Uploaded',
+        description: `${uploadedUrls.length} image(s) uploaded successfully.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Upload Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const removeImage = (urlToRemove: string) => {
+    setProjectImages(projectImages.filter(url => url !== urlToRemove));
   };
 
   const handleSubmitUpdate = async () => {
@@ -123,6 +185,7 @@ export const ProjectUpdateDialog = ({
           project_status: projectStatus,
           progress: progress,
           milestones: milestones,
+          project_images: projectImages,
           last_update_at: new Date().toISOString(),
         } as any)
         .eq('id', deal.id);
@@ -230,10 +293,10 @@ export const ProjectUpdateDialog = ({
               onValueChange={setProjectStatus}
               disabled={!isProvider}
             >
-              <SelectTrigger className="mt-2">
+              <SelectTrigger className="mt-2 bg-background">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border shadow-lg z-50">
                 <SelectItem value="not_started">Not Started</SelectItem>
                 <SelectItem value="in_progress">In Progress</SelectItem>
                 <SelectItem value="review">Under Review</SelectItem>
@@ -247,34 +310,40 @@ export const ProjectUpdateDialog = ({
           <div className="space-y-3">
             <Label>Project Milestones</Label>
             <div className="space-y-2">
-              {milestones.map((milestone) => (
-                <div 
-                  key={milestone.id} 
-                  className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border/50"
-                >
-                  <Checkbox
-                    checked={milestone.completed}
-                    onCheckedChange={() => isProvider && toggleMilestone(milestone.id)}
-                    disabled={!isProvider}
-                  />
-                  <span className={milestone.completed ? 'line-through text-muted-foreground flex-1' : 'flex-1'}>
-                    {milestone.title}
-                  </span>
-                  {milestone.completed && (
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                  )}
-                  {isProvider && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeMilestone(milestone.id)}
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
+              {milestones.length === 0 ? (
+                <p className="text-sm text-muted-foreground p-3 bg-muted/30 rounded-lg">
+                  No milestones added yet
+                </p>
+              ) : (
+                milestones.map((milestone) => (
+                  <div 
+                    key={milestone.id} 
+                    className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border/50"
+                  >
+                    <Checkbox
+                      checked={milestone.completed}
+                      onCheckedChange={() => isProvider && toggleMilestone(milestone.id)}
+                      disabled={!isProvider}
+                    />
+                    <span className={milestone.completed ? 'line-through text-muted-foreground flex-1' : 'flex-1'}>
+                      {milestone.title}
+                    </span>
+                    {milestone.completed && (
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                    )}
+                    {isProvider && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeMilestone(milestone.id)}
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
             
             {isProvider && (
@@ -287,6 +356,66 @@ export const ProjectUpdateDialog = ({
                 />
                 <Button onClick={addMilestone} variant="outline" size="icon">
                   <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Project Images */}
+          <div className="space-y-3">
+            <Label>Project Images</Label>
+            
+            {/* Image Grid */}
+            {projectImages.length > 0 && (
+              <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+                {projectImages.map((url, index) => (
+                  <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-border">
+                    <img 
+                      src={url} 
+                      alt={`Project image ${index + 1}`} 
+                      className="w-full h-full object-cover"
+                    />
+                    {isProvider && (
+                      <button
+                        onClick={() => removeImage(url)}
+                        className="absolute top-1 right-1 p-1 bg-destructive/80 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Upload Button */}
+            {isProvider && (
+              <div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="gap-2"
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4" />
+                      Upload Images
+                    </>
+                  )}
                 </Button>
               </div>
             )}

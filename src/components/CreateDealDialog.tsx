@@ -11,9 +11,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus, X } from "lucide-react";
+
+interface Milestone {
+  id: string;
+  title: string;
+  completed: boolean;
+}
 
 interface CreateDealDialogProps {
   open: boolean;
@@ -22,6 +29,17 @@ interface CreateDealDialogProps {
   providerName: string;
   providerType: string;
 }
+
+const PRESET_MILESTONES = [
+  "Team Mobilization",
+  "Site Survey Complete",
+  "Material Procurement",
+  "Installation Started",
+  "Installation Complete",
+  "Testing & Commissioning",
+  "Documentation Handover",
+  "Project Closeout"
+];
 
 export function CreateDealDialog({
   open,
@@ -32,6 +50,8 @@ export function CreateDealDialog({
 }: CreateDealDialogProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [newMilestone, setNewMilestone] = useState("");
   const [formData, setFormData] = useState({
     projectId: "",
     projectTitle: "",
@@ -44,27 +64,47 @@ export function CreateDealDialog({
     notes: "",
   });
 
+  const addMilestone = (title: string) => {
+    if (title.trim() && !milestones.find(m => m.title === title.trim())) {
+      const milestone: Milestone = {
+        id: `milestone-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+        title: title.trim(),
+        completed: false,
+      };
+      setMilestones([...milestones, milestone]);
+      setNewMilestone("");
+    }
+  };
+
+  const removeMilestone = (id: string) => {
+    setMilestones(milestones.filter(m => m.id !== id));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { error } = await supabase.from("deals").insert({
+      const insertData = {
         project_id: formData.projectId,
         project_title: formData.projectTitle,
         company_name: formData.companyName,
-        company_email: formData.companyEmail,
-        contact_phone: formData.contactPhone,
+        company_email: formData.companyEmail || null,
+        contact_phone: formData.contactPhone || null,
         provider_id: providerId,
         provider_name: providerName,
         provider_type: providerType,
         deal_type: formData.dealType,
         deal_value: formData.dealValue ? parseFloat(formData.dealValue) : null,
-        location: formData.location,
-        notes: formData.notes,
+        location: formData.location || null,
+        notes: formData.notes || null,
         status: "pending",
         start_date: new Date().toISOString(),
-      });
+        milestones: milestones as any,
+        progress: 0,
+        project_status: "not_started",
+      };
+      const { error } = await supabase.from("deals").insert(insertData as any);
 
       if (error) throw error;
 
@@ -85,6 +125,7 @@ export function CreateDealDialog({
         location: "",
         notes: "",
       });
+      setMilestones([]);
 
       onOpenChange(false);
     } catch (error: any) {
@@ -204,6 +245,67 @@ export function CreateDealDialog({
                 placeholder="45000"
               />
             </div>
+          </div>
+
+          {/* Milestones Section */}
+          <div className="space-y-3">
+            <Label>Project Milestones</Label>
+            
+            {/* Preset Milestones */}
+            <div className="flex flex-wrap gap-2">
+              {PRESET_MILESTONES.map((preset) => {
+                const isAdded = milestones.find(m => m.title === preset);
+                return (
+                  <Button
+                    key={preset}
+                    type="button"
+                    variant={isAdded ? "secondary" : "outline"}
+                    size="sm"
+                    onClick={() => isAdded ? removeMilestone(milestones.find(m => m.title === preset)!.id) : addMilestone(preset)}
+                    className="text-xs"
+                  >
+                    {isAdded ? <X className="w-3 h-3 mr-1" /> : <Plus className="w-3 h-3 mr-1" />}
+                    {preset}
+                  </Button>
+                );
+              })}
+            </div>
+
+            {/* Custom Milestone Input */}
+            <div className="flex gap-2">
+              <Input
+                placeholder="Add custom milestone..."
+                value={newMilestone}
+                onChange={(e) => setNewMilestone(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addMilestone(newMilestone))}
+              />
+              <Button 
+                type="button" 
+                onClick={() => addMilestone(newMilestone)} 
+                variant="outline" 
+                size="icon"
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Added Milestones */}
+            {milestones.length > 0 && (
+              <div className="flex flex-wrap gap-2 p-3 bg-muted/30 rounded-lg border border-border/50">
+                {milestones.map((milestone) => (
+                  <Badge key={milestone.id} variant="secondary" className="gap-1 pr-1">
+                    {milestone.title}
+                    <button
+                      type="button"
+                      onClick={() => removeMilestone(milestone.id)}
+                      className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
