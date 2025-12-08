@@ -1,13 +1,29 @@
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
-import { Zap, Menu, X, LogOut, User } from "lucide-react";
-import { useState } from "react";
+import { Zap, Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { ProfileDropdown } from "@/components/ProfileDropdown";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [profileData, setProfileData] = useState<{ avatar_url?: string; full_name?: string } | null>(null);
   const location = useLocation();
   const { user, userRole, signOut } = useAuth();
+
+  useEffect(() => {
+    if (user && userRole === 'provider') {
+      supabase
+        .from('engineer_profiles')
+        .select('avatar_url, full_name')
+        .eq('id', `profile-${user.id}`)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) setProfileData(data);
+        });
+    }
+  }, [user, userRole]);
 
   const publicNavItems = [
     { label: "Services", href: "/services" },
@@ -61,10 +77,10 @@ export const Header = () => {
           {/* Desktop CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
             {user ? (
-              <Button variant="outline" size="sm" onClick={signOut}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </Button>
+              <ProfileDropdown 
+                avatarUrl={profileData?.avatar_url}
+                fullName={profileData?.full_name}
+              />
             ) : (
               <>
                 <Link to="/join">
@@ -112,17 +128,27 @@ export const Header = () => {
               ))}
               <div className="flex flex-col gap-2 mt-4">
                 {user ? (
-                  <Button 
-                    variant="outline" 
-                    className="w-full" 
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      signOut();
-                    }}
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Sign Out
-                  </Button>
+                  <div className="space-y-2">
+                    <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" className="w-full">Update Profile</Button>
+                    </Link>
+                    <Link to="/dashboard?tab=wallet" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" className="w-full">Wallet</Button>
+                    </Link>
+                    <Link to="/dashboard?tab=settings" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" className="w-full">Settings</Button>
+                    </Link>
+                    <Button 
+                      variant="destructive" 
+                      className="w-full" 
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        signOut();
+                      }}
+                    >
+                      Sign Out
+                    </Button>
+                  </div>
                 ) : (
                   <>
                     <Link to="/join" onClick={() => setIsMenuOpen(false)}>

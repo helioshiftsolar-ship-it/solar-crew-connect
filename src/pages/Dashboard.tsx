@@ -165,6 +165,9 @@ export default function Dashboard() {
 
   const fetchDeals = async () => {
     try {
+      // RLS policies now handle filtering:
+      // - Companies see only deals they created (company_id = auth.uid())
+      // - Providers see only deals assigned to them (provider_id = profile-auth.uid())
       const { data, error } = await supabase
         .from("deals")
         .select("*")
