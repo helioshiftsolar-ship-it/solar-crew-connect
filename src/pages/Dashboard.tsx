@@ -815,90 +815,155 @@ export default function Dashboard() {
               {activeProjects.map((deal) => (
                 <Card key={deal.id}>
                   <CardContent className="p-6">
-                    <div className="flex flex-col lg:flex-row gap-6">
-                      {/* Project Info */}
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-lg">{deal.project_title}</h3>
-                          <Badge variant="secondary" className="text-xs">
-                            {deal.deal_type}
-                          </Badge>
-                          <Badge className={`border ${getProjectStatusColor(deal.project_status)}`}>
-                            <Clock className="w-3 h-3 mr-1" />
-                            {getProjectStatusLabel(deal.project_status)}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-3">ID: {deal.project_id}</p>
-                        
-                        <div className="grid grid-cols-2 gap-y-2 text-sm">
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Users className="w-4 h-4" />
-                            <span>{deal.provider_name}</span>
+                    <div className="flex flex-col gap-6">
+                      {/* Header Row */}
+                      <div className="flex flex-col lg:flex-row lg:items-start gap-4">
+                        {/* Project Info */}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-lg">{deal.project_title}</h3>
+                            <Badge variant="secondary" className="text-xs">
+                              {deal.deal_type}
+                            </Badge>
+                            <Badge className={`border ${getProjectStatusColor(deal.project_status)}`}>
+                              <Clock className="w-3 h-3 mr-1" />
+                              {getProjectStatusLabel(deal.project_status)}
+                            </Badge>
                           </div>
-                          {deal.location && (
+                          <p className="text-sm text-muted-foreground mb-3">ID: {deal.project_id}</p>
+                          
+                          <div className="grid grid-cols-2 gap-y-2 text-sm">
                             <div className="flex items-center gap-2 text-muted-foreground">
-                              <MapPin className="w-4 h-4" />
-                              <span>{deal.location}</span>
+                              <Users className="w-4 h-4" />
+                              <span>{deal.provider_name}</span>
                             </div>
-                          )}
-                          {deal.start_date && deal.completion_date && (
-                            <div className="flex items-center gap-2 text-muted-foreground col-span-2">
-                              <Clock className="w-4 h-4" />
-                              <span>
-                                {new Date(deal.start_date).toLocaleDateString()} - {new Date(deal.completion_date).toLocaleDateString()}
-                              </span>
-                            </div>
-                          )}
+                            {deal.location && (
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <MapPin className="w-4 h-4" />
+                                <span>{deal.location}</span>
+                              </div>
+                            )}
+                            {deal.start_date && deal.completion_date && (
+                              <div className="flex items-center gap-2 text-muted-foreground col-span-2">
+                                <Clock className="w-4 h-4" />
+                                <span>
+                                  {new Date(deal.start_date).toLocaleDateString()} - {new Date(deal.completion_date).toLocaleDateString()}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Progress Section */}
+                        <div className="lg:w-64">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm text-muted-foreground">Progress</span>
+                            <span className="text-sm font-semibold">{deal.progress || 0}%</span>
+                          </div>
+                          <Progress value={deal.progress || 0} className="h-2 mb-2" />
+                          <p className="text-xs text-muted-foreground">
+                            Last update: {getLastUpdateTime(deal)}
+                          </p>
+                          
+                          <div className="mt-4">
+                            <p className="text-sm text-muted-foreground">Budget</p>
+                            <p className="text-xl font-bold">${deal.deal_value?.toLocaleString() || '0'}</p>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex lg:flex-col gap-2 justify-end">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => openProjectDetails(deal)}
+                            className="gap-1"
+                          >
+                            <FileText className="w-4 h-4" />
+                            View Details
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleMessage(deal)}
+                            className="gap-1"
+                          >
+                            <MessageSquare className="w-4 h-4" />
+                            Message Team
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleCall(deal)}
+                            className="gap-1"
+                          >
+                            <Phone className="w-4 h-4" />
+                            Call
+                          </Button>
                         </div>
                       </div>
 
-                      {/* Progress Section */}
-                      <div className="lg:w-64">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm text-muted-foreground">Progress</span>
-                          <span className="text-sm font-semibold">{deal.progress || 0}%</span>
+                      {/* Milestones Section */}
+                      {deal.milestones && (deal.milestones as any[]).length > 0 && (
+                        <div className="border-t pt-4">
+                          <p className="text-sm font-medium mb-2">Milestones</p>
+                          <div className="flex flex-wrap gap-2">
+                            {(deal.milestones as any[]).map((milestone: any) => (
+                              <Badge 
+                                key={milestone.id} 
+                                variant={milestone.completed ? "default" : "outline"}
+                                className={milestone.completed ? "bg-green-500/10 text-green-600 border-green-500/20" : ""}
+                              >
+                                {milestone.completed && <CheckCircle className="w-3 h-3 mr-1" />}
+                                {milestone.title}
+                              </Badge>
+                            ))}
+                          </div>
                         </div>
-                        <Progress value={deal.progress || 0} className="h-2 mb-2" />
-                        <p className="text-xs text-muted-foreground">
-                          Last update: {getLastUpdateTime(deal)}
-                        </p>
-                        
-                        <div className="mt-4">
-                          <p className="text-sm text-muted-foreground">Budget</p>
-                          <p className="text-xl font-bold">${deal.deal_value?.toLocaleString() || '0'}</p>
-                        </div>
-                      </div>
+                      )}
 
-                      {/* Action Buttons */}
-                      <div className="flex lg:flex-col gap-2 justify-end">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => openProjectDetails(deal)}
-                          className="gap-1"
-                        >
-                          <FileText className="w-4 h-4" />
-                          View Details
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleMessage(deal)}
-                          className="gap-1"
-                        >
-                          <MessageSquare className="w-4 h-4" />
-                          Message Team
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleCall(deal)}
-                          className="gap-1"
-                        >
-                          <Phone className="w-4 h-4" />
-                          Call
-                        </Button>
-                      </div>
+                      {/* Latest Update Section */}
+                      {deal.provider_updates && (deal.provider_updates as any[]).length > 0 && (
+                        <div className="border-t pt-4">
+                          <p className="text-sm font-medium mb-2">Latest Update</p>
+                          {(() => {
+                            const latestUpdate = (deal.provider_updates as any[])[(deal.provider_updates as any[]).length - 1];
+                            const [timestamp, ...messageParts] = latestUpdate.split(': ');
+                            const message = messageParts.join(': ');
+                            return (
+                              <div className="p-3 bg-muted/30 rounded-lg border border-border/50">
+                                <p className="text-xs text-muted-foreground mb-1">
+                                  {new Date(timestamp).toLocaleString()}
+                                </p>
+                                <p className="text-sm">{message}</p>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      )}
+
+                      {/* Project Images Section */}
+                      {deal.project_images && (deal.project_images as string[]).length > 0 && (
+                        <div className="border-t pt-4">
+                          <p className="text-sm font-medium mb-2">Project Images</p>
+                          <div className="flex gap-2 overflow-x-auto pb-2">
+                            {(deal.project_images as string[]).slice(0, 4).map((url, index) => (
+                              <div key={index} className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border border-border">
+                                <img 
+                                  src={url} 
+                                  alt={`Project image ${index + 1}`} 
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            ))}
+                            {(deal.project_images as string[]).length > 4 && (
+                              <div className="flex-shrink-0 w-20 h-20 rounded-lg border border-border flex items-center justify-center bg-muted/50">
+                                <span className="text-sm text-muted-foreground">+{(deal.project_images as string[]).length - 4}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
