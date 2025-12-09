@@ -123,6 +123,7 @@ export type Database = {
           full_name: string
           hourly_rate: number | null
           id: string
+          is_online: boolean | null
           location: string
           phone: string | null
           profile_type: string
@@ -149,6 +150,7 @@ export type Database = {
           full_name: string
           hourly_rate?: number | null
           id: string
+          is_online?: boolean | null
           location: string
           phone?: string | null
           profile_type?: string
@@ -175,6 +177,7 @@ export type Database = {
           full_name?: string
           hourly_rate?: number | null
           id?: string
+          is_online?: boolean | null
           location?: string
           phone?: string | null
           profile_type?: string
