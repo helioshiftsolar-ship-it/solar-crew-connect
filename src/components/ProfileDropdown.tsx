@@ -40,7 +40,7 @@ export function ProfileDropdown({ avatarUrl, fullName }: ProfileDropdownProps) {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-56 bg-background border shadow-lg z-50" align="end" forceMount>
         <div className="flex items-center gap-3 p-3">
           <Avatar className="h-10 w-10">
             <AvatarImage src={avatarUrl} alt={fullName || "Profile"} />
@@ -55,10 +55,10 @@ export function ProfileDropdown({ avatarUrl, fullName }: ProfileDropdownProps) {
         </div>
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild className="cursor-pointer">
           <Link 
             to="/dashboard" 
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center gap-2 w-full"
             onClick={() => setOpen(false)}
           >
             <User className="w-4 h-4" />
@@ -66,21 +66,23 @@ export function ProfileDropdown({ avatarUrl, fullName }: ProfileDropdownProps) {
           </Link>
         </DropdownMenuItem>
         
-        <DropdownMenuItem asChild>
-          <Link 
-            to="/dashboard?tab=wallet" 
-            className="flex items-center gap-2 cursor-pointer"
-            onClick={() => setOpen(false)}
-          >
-            <Wallet className="w-4 h-4" />
-            <span>Wallet</span>
-          </Link>
-        </DropdownMenuItem>
+        {userRole === 'provider' && (
+          <DropdownMenuItem asChild className="cursor-pointer">
+            <Link 
+              to="/wallet" 
+              className="flex items-center gap-2 w-full"
+              onClick={() => setOpen(false)}
+            >
+              <Wallet className="w-4 h-4" />
+              <span>Wallet</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
         
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild className="cursor-pointer">
           <Link 
-            to="/dashboard?tab=settings" 
-            className="flex items-center gap-2 cursor-pointer"
+            to="/settings" 
+            className="flex items-center gap-2 w-full"
             onClick={() => setOpen(false)}
           >
             <Settings className="w-4 h-4" />
