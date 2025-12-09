@@ -66,18 +66,16 @@ export function ProfileDropdown({ avatarUrl, fullName }: ProfileDropdownProps) {
           </Link>
         </DropdownMenuItem>
         
-        {userRole === 'provider' && (
-          <DropdownMenuItem asChild className="cursor-pointer">
-            <Link 
-              to="/wallet" 
-              className="flex items-center gap-2 w-full"
-              onClick={() => setOpen(false)}
-            >
-              <Wallet className="w-4 h-4" />
-              <span>Wallet</span>
-            </Link>
-          </DropdownMenuItem>
-        )}
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <Link 
+            to="/wallet" 
+            className="flex items-center gap-2 w-full"
+            onClick={() => setOpen(false)}
+          >
+            <Wallet className="w-4 h-4" />
+            <span>Wallet</span>
+          </Link>
+        </DropdownMenuItem>
         
         <DropdownMenuItem asChild className="cursor-pointer">
           <Link 
