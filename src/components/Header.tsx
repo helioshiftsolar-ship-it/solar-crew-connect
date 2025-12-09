@@ -132,10 +132,10 @@ export const Header = () => {
                     <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
                       <Button variant="outline" className="w-full">Update Profile</Button>
                     </Link>
-                    <Link to="/dashboard?tab=wallet" onClick={() => setIsMenuOpen(false)}>
+                    <Link to="/wallet" onClick={() => setIsMenuOpen(false)}>
                       <Button variant="outline" className="w-full">Wallet</Button>
                     </Link>
-                    <Link to="/dashboard?tab=settings" onClick={() => setIsMenuOpen(false)}>
+                    <Link to="/settings" onClick={() => setIsMenuOpen(false)}>
                       <Button variant="outline" className="w-full">Settings</Button>
                     </Link>
                     <Button 
