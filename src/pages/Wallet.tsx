@@ -64,36 +64,48 @@ export default function Wallet() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (user && userRole === 'provider') {
+    if (user) {
       fetchData();
     } else {
       setLoading(false);
     }
-  }, [user, userRole]);
+  }, [user]);
 
   const fetchData = async () => {
     try {
-      const [profileRes, transactionsRes, referralsRes] = await Promise.all([
-        supabase
-          .from("engineer_profiles")
-          .select("id, full_name, wallet_balance, referral_code")
-          .eq("id", `profile-${user?.id}`)
-          .maybeSingle(),
-        supabase
-          .from("wallet_transactions")
-          .select("*")
-          .eq("profile_id", `profile-${user?.id}`)
-          .order("created_at", { ascending: false }),
-        supabase
-          .from("referrals")
-          .select("*")
-          .eq("referrer_profile_id", `profile-${user?.id}`)
-          .order("created_at", { ascending: false }),
-      ]);
+      // For providers, fetch from engineer_profiles
+      // For companies, we'll create a simpler wallet view
+      if (userRole === 'provider') {
+        const [profileRes, transactionsRes, referralsRes] = await Promise.all([
+          supabase
+            .from("engineer_profiles")
+            .select("id, full_name, wallet_balance, referral_code")
+            .eq("id", `profile-${user?.id}`)
+            .maybeSingle(),
+          supabase
+            .from("wallet_transactions")
+            .select("*")
+            .eq("profile_id", `profile-${user?.id}`)
+            .order("created_at", { ascending: false }),
+          supabase
+            .from("referrals")
+            .select("*")
+            .eq("referrer_profile_id", `profile-${user?.id}`)
+            .order("created_at", { ascending: false }),
+        ]);
 
-      if (profileRes.data) setProfile(profileRes.data as Profile);
-      if (transactionsRes.data) setTransactions(transactionsRes.data as Transaction[]);
-      if (referralsRes.data) setReferrals(referralsRes.data as Referral[]);
+        if (profileRes.data) setProfile(profileRes.data as Profile);
+        if (transactionsRes.data) setTransactions(transactionsRes.data as Transaction[]);
+        if (referralsRes.data) setReferrals(referralsRes.data as Referral[]);
+      } else {
+        // Company wallet - simpler view with just referral capability
+        setProfile({
+          id: user?.id || '',
+          full_name: user?.email?.split('@')[0] || 'Company',
+          wallet_balance: 0,
+          referral_code: `REF-${user?.id?.slice(0, 8).toUpperCase()}`,
+        });
+      }
     } catch (error: any) {
       console.error("Error fetching wallet data:", error);
     } finally {
@@ -158,19 +170,7 @@ export default function Wallet() {
     );
   }
 
-  if (userRole !== 'provider') {
-    return (
-      <div className="min-h-screen bg-background pt-16">
-        <div className="container mx-auto px-4 py-8 max-w-3xl text-center">
-          <h1 className="text-2xl font-bold mb-4">Wallet</h1>
-          <p className="text-muted-foreground">Wallet is only available for service providers.</p>
-          <Link to="/dashboard">
-            <Button className="mt-4">Go to Dashboard</Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const isProvider = userRole === 'provider';
 
   return (
     <div className="min-h-screen bg-background pt-16">

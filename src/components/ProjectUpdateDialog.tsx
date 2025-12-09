@@ -419,6 +419,41 @@ export const ProjectUpdateDialog = ({
                 </Button>
               </div>
             )}
+
+            {/* Document Sharing for Companies */}
+            {!isProvider && (
+              <div className="space-y-3 p-4 bg-muted/30 rounded-lg border border-border/50">
+                <Label className="flex items-center gap-2">
+                  <Upload className="w-4 h-4" />
+                  Share Documents with Provider
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Share project-related documents, specifications, or files with the service provider.
+                </p>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+                  multiple
+                  onChange={(e) => {
+                    // Placeholder for document upload
+                    if (e.target.files && e.target.files.length > 0) {
+                      // Document upload would be handled here
+                      console.log('Files selected:', e.target.files);
+                    }
+                  }}
+                  className="hidden"
+                  id="document-upload"
+                />
+                <Button
+                  variant="outline"
+                  onClick={() => document.getElementById('document-upload')?.click()}
+                  className="gap-2 w-full"
+                >
+                  <Upload className="w-4 h-4" />
+                  Upload Documents
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Provider Updates History */}

@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ProjectUpdateDialog } from "@/components/ProjectUpdateDialog";
 import { EditProfileDialog } from "@/components/EditProfileDialog";
 import { AnalyticsDialog } from "@/components/AnalyticsDialog";
+import { ChatDialog } from "@/components/ChatDialog";
 import { Link, useNavigate } from "react-router-dom";
 import { 
   Loader2, 
@@ -117,6 +118,8 @@ export default function Dashboard() {
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
   const [pmDialogOpen, setPmDialogOpen] = useState(false);
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatDeal, setChatDeal] = useState<Deal | null>(null);
   const [copied, setCopied] = useState(false);
   const { user, userRole } = useAuth();
   const { toast } = useToast();
@@ -251,10 +254,8 @@ export default function Dashboard() {
   };
 
   const handleMessage = (deal: Deal) => {
-    toast({
-      title: "Message Team",
-      description: `Opening chat with ${deal.provider_name || deal.company_name}...`,
-    });
+    setChatDeal(deal);
+    setChatOpen(true);
   };
 
   const handleCall = (deal: Deal) => {
@@ -713,6 +714,16 @@ export default function Dashboard() {
             open={analyticsOpen} 
             onOpenChange={setAnalyticsOpen}
           />
+
+          {/* Chat Dialog */}
+          {chatDeal && (
+            <ChatDialog
+              open={chatOpen}
+              onOpenChange={setChatOpen}
+              recipientName={chatDeal.company_name}
+              dealTitle={chatDeal.project_title}
+            />
+          )}
         </div>
       </div>
     );
@@ -1016,6 +1027,16 @@ export default function Dashboard() {
           open={analyticsOpen} 
           onOpenChange={setAnalyticsOpen}
         />
+
+        {/* Chat Dialog */}
+        {chatDeal && (
+          <ChatDialog
+            open={chatOpen}
+            onOpenChange={setChatOpen}
+            recipientName={chatDeal.provider_name}
+            dealTitle={chatDeal.project_title}
+          />
+        )}
       </div>
     </div>
   );
