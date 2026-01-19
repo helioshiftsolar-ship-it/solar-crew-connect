@@ -21,7 +21,10 @@ import {
   DollarSign,
   Calendar,
   X,
-  Loader2
+  Loader2,
+  FileText,
+  Download,
+  File
 } from 'lucide-react';
 
 interface Milestone {
@@ -43,6 +46,7 @@ interface Deal {
   progress: number | null;
   milestones: Milestone[] | null;
   project_images: string[] | null;
+  company_documents: string[] | null;
   start_date: string | null;
   completion_date: string | null;
 }
@@ -66,9 +70,12 @@ export const ProjectUpdateDialog = ({
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [newMilestone, setNewMilestone] = useState('');
   const [projectImages, setProjectImages] = useState<string[]>([]);
+  const [companyDocuments, setCompanyDocuments] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const docInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { userRole } = useAuth();
 
@@ -78,6 +85,7 @@ export const ProjectUpdateDialog = ({
       setProgress(deal.progress || 0);
       setMilestones(deal.milestones || []);
       setProjectImages(deal.project_images || []);
+      setCompanyDocuments(deal.company_documents || []);
     }
   }, [deal]);
 
@@ -167,6 +175,62 @@ export const ProjectUpdateDialog = ({
     setProjectImages(projectImages.filter(url => url !== urlToRemove));
   };
 
+  const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !deal) return;
+
+    setUploadingDoc(true);
+    const uploadedUrls: string[] = [];
+
+    try {
+      for (const file of Array.from(files)) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${deal.id}/${Date.now()}-${file.name}`;
+
+        const { error: uploadError, data } = await supabase.storage
+          .from('project-documents')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('project-documents')
+          .getPublicUrl(fileName);
+
+        uploadedUrls.push(publicUrl);
+      }
+
+      setCompanyDocuments([...companyDocuments, ...uploadedUrls]);
+      toast({
+        title: 'Documents Uploaded',
+        description: `${uploadedUrls.length} document(s) uploaded successfully.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Upload Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingDoc(false);
+      if (docInputRef.current) {
+        docInputRef.current.value = '';
+      }
+    }
+  };
+
+  const removeDocument = (urlToRemove: string) => {
+    setCompanyDocuments(companyDocuments.filter(url => url !== urlToRemove));
+  };
+
+  const getFileNameFromUrl = (url: string) => {
+    const parts = url.split('/');
+    const fileName = parts[parts.length - 1];
+    // Remove timestamp prefix if present
+    const nameWithoutTimestamp = fileName.replace(/^\d+-/, '');
+    return decodeURIComponent(nameWithoutTimestamp);
+  };
+
   const handleSubmitUpdate = async () => {
     if (!deal) return;
     
@@ -186,6 +250,7 @@ export const ProjectUpdateDialog = ({
           progress: progress,
           milestones: milestones,
           project_images: projectImages,
+          company_documents: companyDocuments,
           last_update_at: new Date().toISOString(),
         } as any)
         .eq('id', deal.id);
@@ -420,40 +485,88 @@ export const ProjectUpdateDialog = ({
               </div>
             )}
 
-            {/* Document Sharing for Companies */}
-            {!isProvider && (
-              <div className="space-y-3 p-4 bg-muted/30 rounded-lg border border-border/50">
-                <Label className="flex items-center gap-2">
-                  <Upload className="w-4 h-4" />
-                  Share Documents with Provider
-                </Label>
+            {/* Document Sharing Section */}
+            <div className="space-y-3 p-4 bg-muted/30 rounded-lg border border-border/50">
+              <Label className="flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                {isProvider ? 'Shared Documents from Company' : 'Share Documents with Provider'}
+              </Label>
+              
+              {/* Display uploaded documents */}
+              {companyDocuments.length > 0 && (
+                <div className="space-y-2">
+                  {companyDocuments.map((url, index) => (
+                    <div 
+                      key={index} 
+                      className="flex items-center gap-3 p-3 bg-background rounded-lg border border-border"
+                    >
+                      <File className="w-5 h-5 text-primary flex-shrink-0" />
+                      <span className="text-sm flex-1 truncate">{getFileNameFromUrl(url)}</span>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => window.open(url, '_blank')}
+                          className="h-8 w-8"
+                          title="Download"
+                        >
+                          <Download className="w-4 h-4" />
+                        </Button>
+                        {!isProvider && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeDocument(url)}
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            title="Remove"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {companyDocuments.length === 0 && (
                 <p className="text-sm text-muted-foreground">
-                  Share project-related documents, specifications, or files with the service provider.
+                  {isProvider ? 'No documents shared yet' : 'Share project-related documents, specifications, or files with the service provider.'}
                 </p>
-                <input
-                  type="file"
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-                  multiple
-                  onChange={(e) => {
-                    // Placeholder for document upload
-                    if (e.target.files && e.target.files.length > 0) {
-                      // Document upload would be handled here
-                      console.log('Files selected:', e.target.files);
-                    }
-                  }}
-                  className="hidden"
-                  id="document-upload"
-                />
-                <Button
-                  variant="outline"
-                  onClick={() => document.getElementById('document-upload')?.click()}
-                  className="gap-2 w-full"
-                >
-                  <Upload className="w-4 h-4" />
-                  Upload Documents
-                </Button>
-              </div>
-            )}
+              )}
+
+              {/* Upload Button for Companies */}
+              {!isProvider && (
+                <div>
+                  <input
+                    ref={docInputRef}
+                    type="file"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.png,.jpg,.jpeg,.zip"
+                    multiple
+                    onChange={handleDocumentUpload}
+                    className="hidden"
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => docInputRef.current?.click()}
+                    disabled={uploadingDoc}
+                    className="gap-2 w-full"
+                  >
+                    {uploadingDoc ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4" />
+                        Upload Documents
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Provider Updates History */}
