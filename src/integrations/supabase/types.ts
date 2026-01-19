@@ -17,6 +17,7 @@ export type Database = {
       deals: {
         Row: {
           accepted_at: string | null
+          company_documents: string[] | null
           company_email: string | null
           company_id: string | null
           company_name: string
@@ -45,6 +46,7 @@ export type Database = {
         }
         Insert: {
           accepted_at?: string | null
+          company_documents?: string[] | null
           company_email?: string | null
           company_id?: string | null
           company_name: string
@@ -73,6 +75,7 @@ export type Database = {
         }
         Update: {
           accepted_at?: string | null
+          company_documents?: string[] | null
           company_email?: string | null
           company_id?: string | null
           company_name?: string

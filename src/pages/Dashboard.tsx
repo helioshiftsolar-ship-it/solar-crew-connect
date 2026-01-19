@@ -58,6 +58,7 @@ interface Deal {
   progress: number | null;
   milestones: any[] | null;
   project_images: string[] | null;
+  company_documents: string[] | null;
   last_update_at: string | null;
 }
 
