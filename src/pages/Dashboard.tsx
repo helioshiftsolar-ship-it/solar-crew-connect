@@ -701,9 +701,9 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background pt-16">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8 flex items-start justify-between">
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Project Dashboard</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-1 tracking-tight">Project Dashboard</h1>
             <p className="text-muted-foreground">Track your ongoing I&C teams, tools, and design services</p>
           </div>
           <Button onClick={() => setAnalyticsOpen(true)} className="gap-2">
@@ -712,66 +712,29 @@ export default function Dashboard() {
           </Button>
         </div>
 
+        <LevelBanner
+          name={user?.email || "Your Company"}
+          completed={completedProjects.length}
+          active={activeProjects.length}
+          rating={5}
+          coins={0}
+          subtitle={activeProjects.length > 0 ? `${activeProjects.length} project${activeProjects.length > 1 ? "s" : ""} in motion` : "Start by hiring your first provider"}
+        />
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <Users className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold">{activeProjects.length}</p>
-                  <p className="text-sm text-muted-foreground">Active Projects</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-green-500/10 rounded-lg">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold">{completedProjects.length}</p>
-                  <p className="text-sm text-muted-foreground">Completed</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-orange-500/10 rounded-lg">
-                  <Clock className="w-6 h-6 text-orange-600" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold">{reviewProjects.length}</p>
-                  <p className="text-sm text-muted-foreground">Pending Review</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <TrendingUp className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold">
-                    ${totalBudget >= 1000 ? `${(totalBudget / 1000).toFixed(0)}K` : totalBudget}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Total Budget</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <StatTile icon={Users} value={activeProjects.length} label="Active Projects" delay={0} />
+          <StatTile icon={CheckCircle} value={completedProjects.length} label="Completed" tone="accent" delay={60} />
+          <StatTile icon={Clock} value={reviewProjects.length} label="Pending Review" delay={120} />
+          <StatTile
+            icon={TrendingUp}
+            value={`$${totalBudget >= 1000 ? `${(totalBudget / 1000).toFixed(0)}K` : totalBudget}`}
+            label="Total Budget"
+            tone="accent"
+            delay={180}
+          />
         </div>
+
 
         {/* Active Projects */}
         <div className="mb-8">
