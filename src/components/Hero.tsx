@@ -16,13 +16,14 @@ export const Hero = () => {
       <div className="relative z-10 container mx-auto px-4 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
-          <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-2 mb-6">
-              <Zap className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Solar EPC Solutions</span>
+          <div className="text-center lg:text-left animate-fade-in">
+            <div className="relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-4 py-2 mb-6 backdrop-blur-sm">
+              <span className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 bg-gradient-to-r from-transparent via-primary-foreground/25 to-transparent animate-shimmer" />
+              <Zap className="w-4 h-4 text-primary-foreground" />
+              <span className="text-sm font-medium text-primary-foreground">Solar EPC Solutions</span>
             </div>
             
-            <h1 className="text-4xl lg:text-6xl font-bold text-primary-foreground mb-6 leading-tight">
+            <h1 className="text-4xl lg:text-6xl font-bold text-primary-foreground mb-6 leading-tight tracking-tight">
               Connect Solar EPCs with Expert
               <span className="text-primary block">I&C Teams & Engineers</span>
             </h1>
@@ -49,24 +50,24 @@ export const Hero = () => {
           
           {/* Right Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="bg-card/90 backdrop-blur-sm rounded-lg p-6 text-center shadow-card-hover">
-              <Users className="w-8 h-8 text-primary mx-auto mb-3" />
-              <div className="text-2xl font-bold text-foreground">500+</div>
-              <div className="text-sm text-muted-foreground">Expert Engineers</div>
-            </div>
-            
-            <div className="bg-card/90 backdrop-blur-sm rounded-lg p-6 text-center shadow-card-hover">
-              <Wrench className="w-8 h-8 text-accent mx-auto mb-3" />
-              <div className="text-2xl font-bold text-foreground">1000+</div>
-              <div className="text-sm text-muted-foreground">Projects Completed</div>
-            </div>
-            
-            <div className="bg-card/90 backdrop-blur-sm rounded-lg p-6 text-center shadow-card-hover">
-              <Zap className="w-8 h-8 text-secondary mx-auto mb-3" />
-              <div className="text-2xl font-bold text-foreground">50MW+</div>
-              <div className="text-sm text-muted-foreground">Solar Capacity</div>
-            </div>
+            {[
+              { Icon: Users, value: "500+", label: "Expert Engineers", tone: "text-primary" },
+              { Icon: Wrench, value: "1000+", label: "Projects Completed", tone: "text-accent" },
+              { Icon: Zap, value: "50MW+", label: "Solar Capacity", tone: "text-secondary" },
+            ].map((s, i) => (
+              <div
+                key={s.label}
+                className="group relative overflow-hidden rounded-xl border border-primary-foreground/15 bg-card/90 backdrop-blur-sm p-6 text-center shadow-card-hover transition-all duration-300 hover:-translate-y-1.5 hover:shadow-elevated animate-pop-in"
+                style={{ animationDelay: `${i * 120}ms` }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 bg-gradient-to-br from-primary/10 to-transparent" />
+                <s.Icon className={`relative w-8 h-8 mx-auto mb-3 ${s.tone} transition-transform duration-300 group-hover:scale-110`} />
+                <div className="relative text-2xl font-bold text-foreground">{s.value}</div>
+                <div className="relative text-sm text-muted-foreground">{s.label}</div>
+              </div>
+            ))}
           </div>
+
         </div>
       </div>
     </div>
