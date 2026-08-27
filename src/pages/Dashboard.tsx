@@ -12,6 +12,8 @@ import { ProjectUpdateDialog } from "@/components/ProjectUpdateDialog";
 import { EditProfileDialog } from "@/components/EditProfileDialog";
 import { AnalyticsDialog } from "@/components/AnalyticsDialog";
 import { ChatDialog } from "@/components/ChatDialog";
+import { LevelBanner } from "@/components/gamification/LevelBanner";
+import { StatTile } from "@/components/gamification/StatTile";
 import { Link, useNavigate } from "react-router-dom";
 import { 
   Loader2, 
@@ -332,9 +334,9 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-background pt-16">
         <div className="container mx-auto px-4 py-8">
-          <div className="mb-8 flex items-start justify-between">
+          <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">My Dashboard</h1>
+              <h1 className="text-3xl font-bold text-foreground mb-1 tracking-tight">My Dashboard</h1>
               <p className="text-muted-foreground">Welcome back, {profile?.full_name || user?.email}</p>
             </div>
             <div className="flex gap-2">
@@ -348,64 +350,23 @@ export default function Dashboard() {
             </div>
           </div>
 
+          <LevelBanner
+            name={profile?.full_name || "Your Profile"}
+            completed={profile?.total_projects || 0}
+            active={activeDeals.length}
+            rating={profile?.rating || 0}
+            coins={profile?.wallet_balance || 0}
+            subtitle={pendingDeals.length > 0 ? `${pendingDeals.length} new deal request${pendingDeals.length > 1 ? "s" : ""} waiting` : "You're all caught up"}
+          />
+
           {/* Profile Analytics */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Briefcase className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{profile?.total_projects || 0}</p>
-                    <p className="text-xs text-muted-foreground">Total Projects</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-accent/10 rounded-lg">
-                    <Star className="w-5 h-5 text-accent" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{profile?.rating || 0}</p>
-                    <p className="text-xs text-muted-foreground">Rating</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Wallet className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{profile?.wallet_balance || 0}</p>
-                    <p className="text-xs text-muted-foreground">Wallet Coins</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-500/10 rounded-lg">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold capitalize">{profile?.availability || 'N/A'}</p>
-                    <p className="text-xs text-muted-foreground">Status</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <StatTile icon={Briefcase} value={profile?.total_projects || 0} label="Total Projects" delay={0} />
+            <StatTile icon={Star} value={profile?.rating || 0} label="Rating" tone="accent" delay={60} />
+            <StatTile icon={Wallet} value={profile?.wallet_balance || 0} label="Wallet Coins" delay={120} />
+            <StatTile icon={CheckCircle} value={profile?.availability || "N/A"} label="Status" tone="accent" delay={180} />
           </div>
+
 
           {/* Wallet & Referral Section */}
           <div className="grid lg:grid-cols-2 gap-8 mb-8">
@@ -740,9 +701,9 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background pt-16">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8 flex items-start justify-between">
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Project Dashboard</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-1 tracking-tight">Project Dashboard</h1>
             <p className="text-muted-foreground">Track your ongoing I&C teams, tools, and design services</p>
           </div>
           <Button onClick={() => setAnalyticsOpen(true)} className="gap-2">
@@ -751,66 +712,29 @@ export default function Dashboard() {
           </Button>
         </div>
 
+        <LevelBanner
+          name={user?.email || "Your Company"}
+          completed={completedProjects.length}
+          active={activeProjects.length}
+          rating={5}
+          coins={0}
+          subtitle={activeProjects.length > 0 ? `${activeProjects.length} project${activeProjects.length > 1 ? "s" : ""} in motion` : "Start by hiring your first provider"}
+        />
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <Users className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold">{activeProjects.length}</p>
-                  <p className="text-sm text-muted-foreground">Active Projects</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-green-500/10 rounded-lg">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold">{completedProjects.length}</p>
-                  <p className="text-sm text-muted-foreground">Completed</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-orange-500/10 rounded-lg">
-                  <Clock className="w-6 h-6 text-orange-600" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold">{reviewProjects.length}</p>
-                  <p className="text-sm text-muted-foreground">Pending Review</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <TrendingUp className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold">
-                    ${totalBudget >= 1000 ? `${(totalBudget / 1000).toFixed(0)}K` : totalBudget}
-                  </p>
-                  <p className="text-sm text-muted-foreground">Total Budget</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <StatTile icon={Users} value={activeProjects.length} label="Active Projects" delay={0} />
+          <StatTile icon={CheckCircle} value={completedProjects.length} label="Completed" tone="accent" delay={60} />
+          <StatTile icon={Clock} value={reviewProjects.length} label="Pending Review" delay={120} />
+          <StatTile
+            icon={TrendingUp}
+            value={`$${totalBudget >= 1000 ? `${(totalBudget / 1000).toFixed(0)}K` : totalBudget}`}
+            label="Total Budget"
+            tone="accent"
+            delay={180}
+          />
         </div>
+
 
         {/* Active Projects */}
         <div className="mb-8">

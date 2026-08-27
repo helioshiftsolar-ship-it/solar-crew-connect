@@ -83,17 +83,21 @@ export const HowItWorks = () => {
               </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="relative space-y-4 before:absolute before:left-7 before:top-10 before:bottom-10 before:w-px before:bg-gradient-to-b before:from-secondary/40 before:via-primary/30 before:to-transparent">
               {engineerSteps.map((step, index) => {
                 const IconComponent = step.icon;
                 return (
-                  <Card key={index} className="p-6 hover:shadow-lg transition-shadow">
+                  <Card
+                    key={index}
+                    className="relative p-6 border-border/60 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-elevated animate-fade-in"
+                    style={{ animationDelay: `${index * 90}ms` }}
+                  >
                     <div className="flex gap-4">
                       <div className="relative flex-shrink-0">
-                        <div className="flex items-center justify-center w-14 h-14 bg-gradient-professional rounded-full">
+                        <div className="flex items-center justify-center w-14 h-14 bg-gradient-professional rounded-full ring-4 ring-background">
                           <IconComponent className="w-7 h-7 text-secondary-foreground" />
                         </div>
-                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-xs">
+                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-xs shadow-solar">
                           {index + 1}
                         </div>
                       </div>
@@ -110,6 +114,7 @@ export const HowItWorks = () => {
                 );
               })}
             </div>
+
 
             <div className="text-center mt-8">
               <Link to="/join">
@@ -136,17 +141,21 @@ export const HowItWorks = () => {
               </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="relative space-y-4 before:absolute before:left-7 before:top-10 before:bottom-10 before:w-px before:bg-gradient-to-b before:from-primary/40 before:via-accent/30 before:to-transparent">
               {companySteps.map((step, index) => {
                 const IconComponent = step.icon;
                 return (
-                  <Card key={index} className="p-6 hover:shadow-lg transition-shadow">
+                  <Card
+                    key={index}
+                    className="relative p-6 border-border/60 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-elevated animate-fade-in"
+                    style={{ animationDelay: `${index * 90}ms` }}
+                  >
                     <div className="flex gap-4">
                       <div className="relative flex-shrink-0">
-                        <div className="flex items-center justify-center w-14 h-14 bg-gradient-solar rounded-full">
+                        <div className="flex items-center justify-center w-14 h-14 bg-gradient-solar rounded-full ring-4 ring-background">
                           <IconComponent className="w-7 h-7 text-primary-foreground" />
                         </div>
-                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-accent rounded-full flex items-center justify-center text-accent-foreground font-bold text-xs">
+                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-accent rounded-full flex items-center justify-center text-accent-foreground font-bold text-xs shadow-solar">
                           {index + 1}
                         </div>
                       </div>
@@ -163,6 +172,7 @@ export const HowItWorks = () => {
                 );
               })}
             </div>
+
 
             <div className="text-center mt-8">
               <Link to="/find-services">

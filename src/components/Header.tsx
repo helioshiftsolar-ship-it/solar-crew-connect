@@ -58,14 +58,14 @@ export const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-1 rounded-full border border-border/60 bg-muted/40 px-1.5 py-1">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
+                className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-all duration-300 hover:text-primary ${
                   location.pathname === item.href
-                    ? "text-primary"
+                    ? "bg-card text-primary shadow-card-hover"
                     : "text-muted-foreground"
                 }`}
               >
@@ -73,6 +73,7 @@ export const Header = () => {
               </Link>
             ))}
           </nav>
+
 
           {/* Desktop CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
