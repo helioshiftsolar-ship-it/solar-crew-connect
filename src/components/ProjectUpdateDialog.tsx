@@ -24,7 +24,8 @@ import {
   Loader2,
   FileText,
   Download,
-  File
+  File,
+  Sparkles
 } from 'lucide-react';
 
 interface Milestone {
@@ -279,6 +280,7 @@ export const ProjectUpdateDialog = ({
   if (!deal) return null;
 
   const isProvider = userRole === 'provider';
+  const completedMilestones = milestones.filter((milestone) => milestone.completed).length;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -373,7 +375,20 @@ export const ProjectUpdateDialog = ({
 
           {/* Milestones */}
           <div className="space-y-3">
-            <Label>Project Milestones</Label>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <Label>Project Milestones</Label>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {completedMilestones} of {milestones.length} completed
+                </p>
+              </div>
+              {completedMilestones > 0 && (
+                <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  +{completedMilestones * 25} progress XP
+                </div>
+              )}
+            </div>
             <div className="space-y-2">
               {milestones.length === 0 ? (
                 <p className="text-sm text-muted-foreground p-3 bg-muted/30 rounded-lg">
@@ -383,7 +398,7 @@ export const ProjectUpdateDialog = ({
                 milestones.map((milestone) => (
                   <div 
                     key={milestone.id} 
-                    className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border/50"
+                    className={`flex items-center gap-3 rounded-lg border p-3 transition-colors ${milestone.completed ? 'border-primary/30 bg-primary/5' : 'border-border/50 bg-muted/30'}`}
                   >
                     <Checkbox
                       checked={milestone.completed}
@@ -394,7 +409,7 @@ export const ProjectUpdateDialog = ({
                       {milestone.title}
                     </span>
                     {milestone.completed && (
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-primary" />
                     )}
                     {isProvider && (
                       <Button
