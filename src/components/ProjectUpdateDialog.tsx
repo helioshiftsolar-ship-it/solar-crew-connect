@@ -24,7 +24,8 @@ import {
   Loader2,
   FileText,
   Download,
-  File
+  File,
+  Sparkles
 } from 'lucide-react';
 
 interface Milestone {
