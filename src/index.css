@@ -1,76 +1,60 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Solar Marketplace Design System - Professional B2B with Solar Theme */
-
 @layer base {
   :root {
-    --background: 0 0% 99%;
-    --foreground: 222 20% 15%;
+    /* Midnight Industrial — dark-first control-room theme */
+    --background: 219 46% 5%;
+    --foreground: 210 40% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 20% 15%;
+    --card: 220 43% 11%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 20% 15%;
+    --popover: 220 43% 11%;
+    --popover-foreground: 210 40% 98%;
 
-    /* Professional Teal Primary */
-    --primary: 174 72% 56%;
-    --primary-foreground: 0 0% 100%;
-    --primary-light: 174 65% 65%;
-    --primary-dark: 174 85% 35%;
+    /* Electric teal */
+    --primary: 172 66% 50%;
+    --primary-foreground: 219 46% 5%;
+    --primary-light: 172 70% 65%;
+    --primary-dark: 174 84% 32%;
 
-    /* Deep Navy Secondary */
-    --secondary: 217 91% 15%;
-    --secondary-foreground: 0 0% 100%;
-    --secondary-light: 217 75% 25%;
+    /* Deep panel navy */
+    --secondary: 220 43% 14%;
+    --secondary-foreground: 210 40% 98%;
+    --secondary-light: 220 35% 20%;
 
-    /* Emerald Accent */
-    --accent: 160 85% 45%;
-    --accent-foreground: 0 0% 100%;
-    --accent-light: 160 75% 55%;
+    --accent: 172 66% 50%;
+    --accent-foreground: 219 46% 5%;
+    --accent-light: 166 76% 60%;
 
-    --muted: 220 15% 96%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 220 33% 13%;
+    --muted-foreground: 215 20% 65%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 220 15% 90%;
-    --input: 220 15% 92%;
-    --ring: 35 100% 55%;
+    --border: 217 30% 18%;
+    --input: 217 30% 18%;
+    --ring: 172 66% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    /* Professional Gradients */
-    --gradient-solar: linear-gradient(135deg, hsl(174 72% 56%), hsl(174 65% 65%));
-    --gradient-professional: linear-gradient(135deg, hsl(217 91% 15%), hsl(217 75% 25%));
-    --gradient-hero: linear-gradient(135deg, hsl(174 72% 56%) 0%, hsl(217 91% 15%) 100%);
-    
-    /* Enhanced Shadows */
-    --shadow-solar: 0 10px 40px -10px hsl(174 72% 56% / 0.25);
-    --shadow-card: 0 4px 20px -4px hsl(217 91% 15% / 0.1);
-    --shadow-elevated: 0 8px 30px -8px hsl(217 91% 15% / 0.2);
-    
-    /* Animations */
+    --gradient-solar: linear-gradient(135deg, hsl(172 66% 50%), hsl(166 76% 60%));
+    --gradient-professional: linear-gradient(135deg, hsl(220 43% 11%), hsl(219 46% 5%));
+    --gradient-hero: linear-gradient(160deg, hsl(219 46% 5%) 0%, hsl(220 43% 11%) 100%);
+
+    --shadow-solar: 0 0 40px -8px hsl(172 66% 50% / 0.35);
+    --shadow-card: 0 4px 24px -8px hsl(219 60% 2% / 0.8);
+    --shadow-elevated: 0 24px 60px -20px hsl(219 60% 2% / 0.9);
+
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 220 43% 11%;
+    --sidebar-foreground: 215 20% 65%;
+    --sidebar-primary: 172 66% 50%;
+    --sidebar-primary-foreground: 219 46% 5%;
+    --sidebar-accent: 220 33% 16%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 30% 18%;
+    --sidebar-ring: 172 66% 50%;
   }
 
   .dark {
@@ -118,6 +102,10 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5 {
+    @apply font-display tracking-tight;
   }
 }
