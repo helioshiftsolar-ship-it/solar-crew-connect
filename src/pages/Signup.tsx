@@ -3,12 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Gift } from "lucide-react";
+import { Building2, CheckCircle2, Gift, Sparkles, Wrench } from "lucide-react";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -141,11 +140,15 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-background pt-16 flex items-center justify-center px-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-background pt-24 pb-12 flex items-center justify-center px-4">
+      <Card className="w-full max-w-xl overflow-hidden border-primary/20 shadow-xl">
+        <div className="h-1.5 bg-gradient-to-r from-primary via-accent to-primary" />
         <CardHeader className="text-center">
+          <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Sparkles className="h-5 w-5" />
+          </div>
           <CardTitle className="text-2xl font-bold text-foreground">Join SolarConnect</CardTitle>
-          <CardDescription>Create your account to get started</CardDescription>
+          <CardDescription>Choose your path and create your professional account</CardDescription>
         </CardHeader>
         <CardContent>
           {referralCode && (
@@ -157,6 +160,37 @@ export default function Signup() {
             </Alert>
           )}
           <form onSubmit={handleSignup} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Choose your account type</Label>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Button
+                  type="button"
+                  variant={userType === "epc_company" ? "default" : "outline"}
+                  onClick={() => setUserType("epc_company")}
+                  className="h-auto justify-start gap-3 px-4 py-4 text-left"
+                >
+                  <Building2 className="h-5 w-5 shrink-0" />
+                  <span className="flex-1">
+                    <span className="block font-semibold">EPC Company</span>
+                    <span className="block text-xs opacity-80">Hire experts and manage work</span>
+                  </span>
+                  {userType === "epc_company" && <CheckCircle2 className="h-4 w-4 shrink-0" />}
+                </Button>
+                <Button
+                  type="button"
+                  variant={userType === "engineer" ? "default" : "outline"}
+                  onClick={() => setUserType("engineer")}
+                  className="h-auto justify-start gap-3 px-4 py-4 text-left"
+                >
+                  <Wrench className="h-5 w-5 shrink-0" />
+                  <span className="flex-1">
+                    <span className="block font-semibold">Engineer / Provider</span>
+                    <span className="block text-xs opacity-80">Showcase skills and earn</span>
+                  </span>
+                  {userType === "engineer" && <CheckCircle2 className="h-4 w-4 shrink-0" />}
+                </Button>
+              </div>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="fullName">Full Name</Label>
               <Input
@@ -188,18 +222,6 @@ export default function Signup() {
                 placeholder="Create a password"
                 required
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="userType">Account Type</Label>
-              <Select value={userType} onValueChange={setUserType} required>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select account type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="epc_company">EPC Company</SelectItem>
-                  <SelectItem value="engineer">Engineer/Freelancer</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Creating account..." : "Create Account"}
