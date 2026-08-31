@@ -1,3 +1,4 @@
+import { DEFAULT_MILESTONES } from '@/lib/milestones';
 import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -84,7 +85,11 @@ export const ProjectUpdateDialog = ({
     if (deal) {
       setProjectStatus(deal.project_status || 'not_started');
       setProgress(deal.progress || 0);
-      setMilestones(deal.milestones || []);
+      setMilestones(
+        deal.milestones && deal.milestones.length > 0
+          ? deal.milestones
+          : DEFAULT_MILESTONES.map((m) => ({ ...m }))
+      );
       setProjectImages(deal.project_images || []);
       setCompanyDocuments(deal.company_documents || []);
     }
