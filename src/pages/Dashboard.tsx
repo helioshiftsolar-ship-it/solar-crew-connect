@@ -12,6 +12,8 @@ import { ProjectUpdateDialog } from "@/components/ProjectUpdateDialog";
 import { EditProfileDialog } from "@/components/EditProfileDialog";
 import { AnalyticsDialog } from "@/components/AnalyticsDialog";
 import { ChatDialog } from "@/components/ChatDialog";
+import { VideoCallDialog } from "@/components/VideoCallDialog";
+import { MilestoneProgress } from "@/components/MilestoneProgress";
 import { LevelBanner } from "@/components/gamification/LevelBanner";
 import { StatTile } from "@/components/gamification/StatTile";
 import { Link, useNavigate } from "react-router-dom";
