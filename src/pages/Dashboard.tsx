@@ -35,6 +35,7 @@ import {
   Users,
   Phone,
   MessageSquare,
+  Video,
   Search
 } from "lucide-react";
 
@@ -125,6 +126,8 @@ export default function Dashboard() {
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatDeal, setChatDeal] = useState<Deal | null>(null);
+  const [videoOpen, setVideoOpen] = useState(false);
+  const [videoDeal, setVideoDeal] = useState<Deal | null>(null);
   const [copied, setCopied] = useState(false);
   const { user, userRole } = useAuth();
   const { toast } = useToast();
@@ -261,6 +264,11 @@ export default function Dashboard() {
   const handleMessage = (deal: Deal) => {
     setChatDeal(deal);
     setChatOpen(true);
+  };
+
+  const handleVideoCall = (deal: Deal) => {
+    setVideoDeal(deal);
+    setVideoOpen(true);
   };
 
   const handleCall = (deal: Deal) => {
@@ -647,6 +655,15 @@ export default function Dashboard() {
                             <Button 
                               variant="outline" 
                               size="sm"
+                              onClick={() => handleVideoCall(deal)}
+                              className="gap-1"
+                            >
+                              <Video className="w-4 h-4" />
+                              Video Call
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
                               onClick={() => handleCall(deal)}
                               className="gap-1"
                             >
@@ -654,6 +671,9 @@ export default function Dashboard() {
                               Call
                             </Button>
                           </div>
+                        </div>
+                        <div className="mt-4">
+                          <MilestoneProgress milestones={deal.milestones as any[]} />
                         </div>
                       </CardContent>
                     </Card>
@@ -686,6 +706,15 @@ export default function Dashboard() {
               onOpenChange={setChatOpen}
               recipientName={chatDeal.company_name}
               dealTitle={chatDeal.project_title}
+            />
+          )}
+
+          {videoDeal && (
+            <VideoCallDialog
+              open={videoOpen}
+              onOpenChange={setVideoOpen}
+              recipientName={videoDeal.company_name}
+              dealTitle={videoDeal.project_title}
             />
           )}
         </div>
@@ -835,6 +864,15 @@ export default function Dashboard() {
                           <Button 
                             variant="outline" 
                             size="sm"
+                            onClick={() => handleVideoCall(deal)}
+                            className="gap-1"
+                          >
+                            <Video className="w-4 h-4" />
+                            Video Call
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
                             onClick={() => handleCall(deal)}
                             className="gap-1"
                           >
@@ -845,23 +883,7 @@ export default function Dashboard() {
                       </div>
 
                       {/* Milestones Section */}
-                      {deal.milestones && (deal.milestones as any[]).length > 0 && (
-                        <div className="border-t pt-4">
-                          <p className="text-sm font-medium mb-2">Milestones</p>
-                          <div className="flex flex-wrap gap-2">
-                            {(deal.milestones as any[]).map((milestone: any) => (
-                              <Badge 
-                                key={milestone.id} 
-                                variant={milestone.completed ? "default" : "outline"}
-                                className={milestone.completed ? "bg-green-500/10 text-green-600 border-green-500/20" : ""}
-                              >
-                                {milestone.completed && <CheckCircle className="w-3 h-3 mr-1" />}
-                                {milestone.title}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                      <MilestoneProgress milestones={deal.milestones as any[]} />
 
                       {/* Latest Update Section */}
                       {deal.provider_updates && (deal.provider_updates as any[]).length > 0 && (
@@ -964,6 +986,15 @@ export default function Dashboard() {
             dealTitle={chatDeal.project_title}
           />
         )}
+
+          {videoDeal && (
+            <VideoCallDialog
+              open={videoOpen}
+              onOpenChange={setVideoOpen}
+              recipientName={videoDeal.provider_name}
+              dealTitle={videoDeal.project_title}
+            />
+          )}
       </div>
     </div>
   );
