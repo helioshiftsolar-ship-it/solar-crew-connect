@@ -31,6 +31,7 @@ import {
   Gift
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { ToolsGrid } from "@/components/ToolsGrid";
 import { ServicesGrid } from "@/components/ServicesGrid";
 import { CreateDealDialog } from "@/components/CreateDealDialog";
@@ -63,6 +64,7 @@ interface Profile {
 export default function EngineerProfile() {
   const { id } = useParams();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [tools, setTools] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
@@ -70,6 +72,9 @@ export default function EngineerProfile() {
   const [dealDialogOpen, setDealDialogOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [transactions, setTransactions] = useState<any[]>([]);
+
+  // Wallet & referral details are private — only visible to the profile owner
+  const isOwner = !!user && !!id && id === `profile-${user.id}`;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,14 +111,16 @@ export default function EngineerProfile() {
             setServices(servicesData || []);
           }
 
-          // Fetch wallet transactions
-          const { data: transactionsData } = await supabase
-            .from('wallet_transactions')
-            .select('*')
-            .eq('profile_id', id)
-            .order('created_at', { ascending: false })
-            .limit(10);
-          setTransactions(transactionsData || []);
+          // Fetch wallet transactions (owner only)
+          if (isOwner) {
+            const { data: transactionsData } = await supabase
+              .from('wallet_transactions')
+              .select('*')
+              .eq('profile_id', id)
+              .order('created_at', { ascending: false })
+              .limit(10);
+            setTransactions(transactionsData || []);
+          }
         }
       } catch (error) {
         console.error('Error:', error);
