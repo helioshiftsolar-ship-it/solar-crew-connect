@@ -130,7 +130,7 @@ export default function EngineerProfile() {
     };
 
     fetchData();
-  }, [id]);
+  }, [id, isOwner]);
 
   if (loading) {
     return (
@@ -496,7 +496,8 @@ export default function EngineerProfile() {
           </Card>
         </div>
 
-        {/* Wallet & Referral Section */}
+        {/* Wallet & Referral Section — private, only visible to the profile owner */}
+        {isOwner && (
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
           {/* Wallet Card */}
           <Card className="overflow-hidden">
@@ -594,6 +595,7 @@ export default function EngineerProfile() {
             </div>
           </Card>
         </div>
+        )}
 
         {/* Tools Section (for tool providers) */}
         {profile.profile_type === 'tool_provider' && (
