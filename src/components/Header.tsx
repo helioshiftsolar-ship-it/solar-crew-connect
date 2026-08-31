@@ -27,22 +27,20 @@ export const Header = () => {
 
   const publicNavItems = [
     { label: "Services", href: "/services" },
-    { label: "How It Works", href: "/how-it-works" },
     { label: "Pricing", href: "/pricing" },
   ];
-  
+
   const authenticatedNavItems = [
-    { label: "Home", href: "/" },
     { label: "Dashboard", href: "/dashboard" },
     { label: "Deals", href: "/deals" },
     { label: "Services", href: "/services" },
   ];
-  
+
   // Add profile link for providers
-  const providerNavItems = userRole === 'provider' 
+  const providerNavItems = userRole === 'provider'
     ? [...authenticatedNavItems, { label: "My Profile", href: `/profile/profile-${user?.id}` }]
     : authenticatedNavItems;
-  
+
   const navItems = user ? providerNavItems : publicNavItems;
 
   return (
